@@ -61,6 +61,13 @@
       label: 'Members-only content',
       description: 'Hide videos, posts, and shelves marked Members-only or Join-exclusive.',
       defaultValue: true
+    },
+    {
+      id: 'blockPlayables',
+      group: 'restrictions',
+      label: 'YouTube Playables',
+      description: 'Hide Playables mini-games, homepage shelves, sidebar links, and Playables pages.',
+      defaultValue: true
     }
   ]);
 
@@ -156,14 +163,6 @@
       channelIds: ['UCrpQ4p1Ql_hG8rKXIKM1MOQ']
     },
     {
-      key: 'playables',
-      label: 'Playables',
-      group: 'Explore',
-      aliases: ['playables'],
-      urlPatterns: ['/playables'],
-      channelIds: []
-    },
-    {
       key: 'youtube_music',
       label: 'YouTube Music',
       group: 'Services',
@@ -257,7 +256,8 @@
   var DEDICATED_SIDEBAR_KEYS = Object.freeze({
     shorts: true,
     trending: true,
-    premium: true
+    premium: true,
+    playables: true
   });
 
   function createDefaultSettings() {
@@ -374,6 +374,17 @@
       lowerLabel === 'get youtube premium'
     ) {
       return { key: 'premium', label: label || 'YouTube Premium', dedicated: true };
+    }
+
+    if (
+      lowerHref === '/playables' ||
+      lowerHref.indexOf('/playables?') === 0 ||
+      lowerHref.indexOf('/playables/') === 0 ||
+      lowerHref.indexOf('youtube.com/playables') !== -1 ||
+      lowerLabel === 'playables' ||
+      lowerLabel === 'youtube playables'
+    ) {
+      return { key: 'playables', label: label || 'Playables', dedicated: true };
     }
 
     // Match against known canonical catalog (URL patterns, channel IDs, then label aliases).

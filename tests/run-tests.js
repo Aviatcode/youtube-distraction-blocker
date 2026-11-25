@@ -123,6 +123,7 @@ async function runAll() {
     assert.strictEqual(defaults.features.blockTrending, true);
     assert.strictEqual(defaults.features.blockPremium, true);
     assert.strictEqual(defaults.features.blockMembersOnly, true);
+    assert.strictEqual(defaults.features.blockPlayables, true);
     assert.deepStrictEqual(defaults.sidebarHidden, {});
 
     var normalized = YTB.normalizeSettings({
@@ -199,6 +200,8 @@ async function runAll() {
     assert.strictEqual(YTB.resolveSidebarEntry({ href: '/shorts', label: 'Shorts' }).dedicated, true);
     assert.strictEqual(YTB.resolveSidebarEntry({ href: '/feed/trending', label: 'Trending' }).dedicated, true);
     assert.strictEqual(YTB.resolveSidebarEntry({ href: '/premium', label: 'YouTube Premium' }).dedicated, true);
+    assert.strictEqual(YTB.resolveSidebarEntry({ href: '/playables', label: 'Playables' }).key, 'playables');
+    assert.strictEqual(YTB.resolveSidebarEntry({ href: '/playables', label: 'Playables' }).dedicated, true);
 
     assert.strictEqual(YTB.resolveSidebarEntry({ href: 'https://www.youtubekids.com/', label: 'YouTube Kids' }).key, 'kids');
     assert.strictEqual(YTB.resolveSidebarEntry({ href: '/feed/storefront', label: 'Movies & TV' }).key, 'movies');
@@ -591,6 +594,65 @@ async function runAll() {
     assert.strictEqual(gamingMatches[0].detected, true);
     assert.ok(merged.some(function (item) { return item.key === 'path_hype' && item.detected === true; }));
     assert.strictEqual(merged.some(function (item) { return item.key === 'shorts'; }), false);
+    assert.strictEqual(merged.some(function (item) { return item.key === 'playables'; }), false);
+  });
+
+  await test('DOM controller: YouTube Playables blocker (shelves, cards, sidebar, /playables route) without false positives', function () {
+    var doc = new domMock.MockDocument();
+    var win = createMockWindow('/');
+    var el = domMock.el;
+
+    var playablesSidebar = el(doc, 'ytd-guide-entry-renderer', { id: 'nav-playables' }, [
+      el(doc, 'a', { id: 'endpoint', href: '/playables', title: 'Playables' }, [
+        el(doc, 'yt-formatted-string', { class: 'title' }, [], 'Playables')
+      ])
+    ]);
+    var exploreSec = el(doc, 'ytd-guide-section-renderer', { id: 'playables-explore' }, [playablesSidebar]);
+
+    var playablesShelf = el(doc, 'ytd-rich-section-renderer', { id: 'playables-shelf' }, [
+      el(doc, 'grid-shelf-view-model', {}, [
+        el(doc, 'h2', {}, [], 'YouTube Playables'),
+        el(doc, 'mini-game-card-view-model', {}, [
+          el(doc, 'a', { href: '/playables/game123' }, [], 'Stack Bounce')
+        ])
+      ])
+    ]);
+
+    var homePlayablesChip = el(doc, 'yt-chip-cloud-chip-renderer', { id: 'home-playables-chip' }, [], 'Playables');
+    var normalGamingVideo = el(doc, 'ytd-rich-item-renderer', { id: 'normal-gaming' }, [
+      el(doc, 'a', { href: '/watch?v=game99', id: 'video-title' }, [], 'Trying YouTube Playables Review')
+    ]);
+    var homeBrowse = el(doc, 'ytd-browse', { 'page-subtype': 'home' }, [homePlayablesChip, playablesShelf, normalGamingVideo]);
+
+    doc.body.appendChild(exploreSec);
+    doc.body.appendChild(homeBrowse);
+
+    var ctrl = controllerMod.createController({ document: doc, window: win });
+    var settings = YTB.createDefaultSettings();
+    ctrl.init(settings);
+
+    assert.strictEqual(doc.documentElement.getAttribute('data-ytb-playables'), 'true');
+    assert.strictEqual(playablesSidebar.getAttribute('data-ytb-playables-item'), 'true');
+    assert.strictEqual(exploreSec.getAttribute('data-ytb-empty-section'), 'true');
+    assert.strictEqual(playablesShelf.getAttribute('data-ytb-playables-item'), 'true');
+    assert.strictEqual(homePlayablesChip.getAttribute('data-ytb-playables-item'), 'true');
+    // Normal video mentioning "YouTube Playables" in title must NOT be hidden.
+    assert.strictEqual(normalGamingVideo.hasAttribute('data-ytb-playables-item'), false);
+
+    // Navigating to /playables shows blocked notice banner and toggling OFF removes it.
+    win.location.pathname = '/playables';
+    doc.body.appendChild(el(doc, 'ytd-browse', { 'page-subtype': 'playables' }));
+    ctrl.handleNavigation();
+    assert.strictEqual(doc.documentElement.getAttribute('data-ytb-route'), 'playables');
+    assert.ok(doc.querySelector('.ytb-blocked-page-banner'));
+
+    settings.features.blockPlayables = false;
+    ctrl.applySettings(settings);
+    assert.strictEqual(doc.documentElement.getAttribute('data-ytb-playables'), 'false');
+    assert.strictEqual(exploreSec.hasAttribute('data-ytb-empty-section'), false);
+    assert.strictEqual(doc.querySelector('.ytb-blocked-page-banner'), null);
+
+    ctrl.destroy();
   });
 
   console.log('\nSummary: ' + passed + ' passed, ' + failed + ' failed.');

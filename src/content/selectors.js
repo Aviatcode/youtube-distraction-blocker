@@ -17,6 +17,9 @@
       'ytd-playlist-video-renderer',
       'yt-lockup-view-model',
       'ytd-reel-item-renderer',
+      'mini-game-card-view-model',
+      'ytd-mini-game-card-view-model',
+      'ytm-mini-game-card-view-model',
       'ytm-video-with-context-renderer',
       'ytm-rich-item-renderer'
     ].join(','),
@@ -131,6 +134,11 @@
     'youtube shorts'
   ]);
 
+  var PLAYABLES_LABELS = Object.freeze([
+    'playables',
+    'youtube playables'
+  ]);
+
   function normalizeText(value) {
     return String(value || '').replace(/\s+/g, ' ').trim().toLowerCase();
   }
@@ -184,7 +192,8 @@
     if (path === '/' || path === '') return 'home';
     if (path.indexOf('/watch') === 0) return 'watch';
     if (path.indexOf('/results') === 0) return 'results';
-    if (path.indexOf('/shorts') === 0) return 'shorts';
+    if (path === '/shorts' || path.indexOf('/shorts/') === 0) return 'shorts';
+    if (path === '/playables' || path.indexOf('/playables/') === 0) return 'playables';
     if (path.indexOf('/feed/trending') === 0 || path.indexOf('/feed/explore') === 0) return 'trending';
     if (path.indexOf('/feed/subscriptions') === 0) return 'subscriptions';
     if (path.indexOf('/channel/') === 0 || path.indexOf('/@') === 0 || path.indexOf('/c/') === 0 || path.indexOf('/user/') === 0) {
@@ -373,6 +382,44 @@
     return text === 'trending' || text === 'trending videos' || text === 'trending now';
   }
 
+  function isPlayablesLink(href) {
+    if (!href) return false;
+    var lower = String(href).trim().toLowerCase();
+    if (lower === '/playables' || lower.indexOf('/playables/') === 0 || lower.indexOf('/playables?') === 0) {
+      return true;
+    }
+    try {
+      var parsed = new URL(href, 'https://www.youtube.com');
+      return parsed.pathname === '/playables' || parsed.pathname.indexOf('/playables/') === 0;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function isPlayablesCardOrShelf(el) {
+    if (!isElement(el)) return false;
+    var tag = (el.tagName || '').toLowerCase();
+    if (tag === 'mini-game-card-view-model' || tag === 'ytd-mini-game-card-view-model' || tag === 'ytm-mini-game-card-view-model') {
+      return true;
+    }
+    if (el.querySelector('mini-game-card-view-model, ytd-mini-game-card-view-model, ytm-mini-game-card-view-model')) {
+      return true;
+    }
+    if (tag === 'ytd-rich-section-renderer' || tag === 'ytd-rich-shelf-renderer' || tag === 'ytd-shelf-renderer' || tag === 'grid-shelf-view-model') {
+      var heading = el.querySelector('#title, #title-text, h2');
+      if (matchesExactPhrase(getTextSafe(heading), PLAYABLES_LABELS)) {
+        return true;
+      }
+    }
+    var anchors = el.querySelectorAll('a[href]');
+    for (var i = 0; i < anchors.length; i++) {
+      if (isPlayablesLink(getAttributeSafe(anchors[i], 'href'))) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   function isShortsTabElement(el) {
     if (!isElement(el)) return false;
     var tag = (el.tagName || '').toLowerCase();
@@ -473,17 +520,33 @@
 
       if (info.key === 'shorts') {
         setBooleanAttr(el, 'data-ytb-shorts-tab-item', true);
+        setBooleanAttr(el, 'data-ytb-trending-item', false);
+        setBooleanAttr(el, 'data-ytb-premium-item', false);
+        setBooleanAttr(el, 'data-ytb-playables-item', false);
         if (el.hasAttribute('data-ytb-sidebar-key')) el.removeAttribute('data-ytb-sidebar-key');
       } else if (info.key === 'trending') {
+        setBooleanAttr(el, 'data-ytb-shorts-tab-item', false);
         setBooleanAttr(el, 'data-ytb-trending-item', true);
+        setBooleanAttr(el, 'data-ytb-premium-item', false);
+        setBooleanAttr(el, 'data-ytb-playables-item', false);
         if (el.hasAttribute('data-ytb-sidebar-key')) el.removeAttribute('data-ytb-sidebar-key');
       } else if (info.key === 'premium') {
+        setBooleanAttr(el, 'data-ytb-shorts-tab-item', false);
+        setBooleanAttr(el, 'data-ytb-trending-item', false);
         setBooleanAttr(el, 'data-ytb-premium-item', true);
+        setBooleanAttr(el, 'data-ytb-playables-item', false);
+        if (el.hasAttribute('data-ytb-sidebar-key')) el.removeAttribute('data-ytb-sidebar-key');
+      } else if (info.key === 'playables') {
+        setBooleanAttr(el, 'data-ytb-shorts-tab-item', false);
+        setBooleanAttr(el, 'data-ytb-trending-item', false);
+        setBooleanAttr(el, 'data-ytb-premium-item', false);
+        setBooleanAttr(el, 'data-ytb-playables-item', true);
         if (el.hasAttribute('data-ytb-sidebar-key')) el.removeAttribute('data-ytb-sidebar-key');
       } else {
         setBooleanAttr(el, 'data-ytb-shorts-tab-item', false);
         setBooleanAttr(el, 'data-ytb-trending-item', false);
         setBooleanAttr(el, 'data-ytb-premium-item', false);
+        setBooleanAttr(el, 'data-ytb-playables-item', false);
         if (!info.skipCatalog) {
           el.setAttribute('data-ytb-sidebar-key', info.key);
           return info;
@@ -497,6 +560,7 @@
       setBooleanAttr(el, 'data-ytb-shorts-tab-item', isShortsTabElement(el));
       if (tag === 'yt-chip-cloud-chip-renderer') {
         setBooleanAttr(el, 'data-ytb-trending-item', isTrendingShelfOrChip(el));
+        setBooleanAttr(el, 'data-ytb-playables-item', Boolean(el.closest('ytd-browse')) && matchesExactPhrase(getTextSafe(el), PLAYABLES_LABELS));
       }
       return null;
     }
@@ -530,6 +594,7 @@
       setBooleanAttr(shelfContainer, 'data-ytb-trending-item', isTrendingShelfOrChip(shelfContainer));
       setBooleanAttr(shelfContainer, 'data-ytb-premium-item', isPremiumPromoElement(shelfContainer));
       setBooleanAttr(shelfContainer, 'data-ytb-members-item', isMembersOnlyShelf(shelfContainer));
+      setBooleanAttr(shelfContainer, 'data-ytb-playables-item', isPlayablesCardOrShelf(shelfContainer));
       return null;
     }
 
@@ -545,6 +610,7 @@
       setBooleanAttr(targetCard, 'data-ytb-subscription-shorts-item', cardInSubscriptions && cardIsShorts);
       setBooleanAttr(targetCard, 'data-ytb-premium-item', isPremiumCard(targetCard));
       setBooleanAttr(targetCard, 'data-ytb-members-item', isMembersOnlyCard(targetCard));
+      setBooleanAttr(targetCard, 'data-ytb-playables-item', isPlayablesCardOrShelf(targetCard));
       return null;
     }
 
@@ -562,6 +628,7 @@
     isShortsCardOrShelf: isShortsCardOrShelf,
     isShortsTabElement: isShortsTabElement,
     isTrendingShelfOrChip: isTrendingShelfOrChip,
+    isPlayablesCardOrShelf: isPlayablesCardOrShelf,
     isSubscribedChannelEntry: isSubscribedChannelEntry,
     extractSidebarEntryInfo: extractSidebarEntryInfo,
     evaluateElement: evaluateElement

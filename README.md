@@ -18,9 +18,11 @@ A lightweight, privacy-first, plain JavaScript/HTML/CSS Chrome & Chromium extens
    Hides YouTube Premium sidebar links, promotional banners, upsell mealbars/dialogs (with safe overlay dismissal so pages never freeze), and Premium-badged promo shelves—never hiding normal creator videos whose titles merely contain "Premium".
 6. **Members-Only Blocker (Content Restrictions)**  
    Hides videos, community posts, and shelves explicitly marked **Members-only** / **Join-exclusive** via badge/renderer metadata—never hiding ordinary public videos from channels that offer memberships.
-7. **Dynamic Sidebar Customization (Sidebar)**  
-   Provides individual ON/OFF hiding switches for Kids, Movies & TV, News, Sports, Gaming, Music, Podcasts, Live, Shopping, Courses/Learning, Fashion & Beauty, Playables, YouTube Music, YouTube Studio, and any additional navigation items dynamically detected on your specific YouTube account (while leaving subscribed creator channels untouched).
-8. **Independent Persistence & Master Switch**  
+7. **YouTube Playables Blocker (Content Restrictions)**  
+   Hides Playables mini-games, homepage Playables shelves, Playables filter chips, sidebar navigation links, and Playables pages without blocking normal gaming videos.
+8. **Dynamic Sidebar Customization (Sidebar)**  
+   Provides individual ON/OFF hiding switches for Kids, Movies & TV, News, Sports, Gaming, Music, Podcasts, Live, Shopping, Courses/Learning, Fashion & Beauty, YouTube Music, YouTube Studio, and any additional navigation items dynamically detected on your specific YouTube account (while leaving subscribed creator channels untouched).
+9. **Independent Persistence & Master Switch**  
    Every toggle is independent, stored locally in `chrome.storage.local`, survives browser restarts, and updates open YouTube tabs immediately without refreshing. The **Master** switch pauses all filtering at once without losing individual preferences, and **Restore Defaults** resets configuration cleanly.
 
 ---
@@ -130,6 +132,7 @@ Open `https://www.youtube.com/` after loading the unpacked extension and verify 
 - [ ] **Trending Blocker:** Confirm **Trending** disappears from the sidebar Explore section (while Music, Gaming, Sports, etc. remain unaffected). Navigate directly to `https://www.youtube.com/feed/trending` and confirm Trending videos are hidden and the clean notice banner appears.
 - [ ] **Premium Content Blocker:** Confirm **YouTube Premium** disappears from the left sidebar, and any Premium homepage banners/mealbars/upsell dialogs are hidden without freezing page clicks. Search for `"premium review"` and confirm normal creator videos mentioning "Premium" in their title are **not** blocked.
 - [ ] **Members-Only Blocker:** Visit a channel that posts Members-only videos or community posts. Confirm items carrying a **Members only** badge are hidden, while the same channel's ordinary public videos remain visible.
+- [ ] **YouTube Playables Blocker:** Confirm **Playables** disappears from the sidebar Explore section and Playables game shelves/cards disappear from Home (and `/playables` shows the blocked notice), while ordinary gaming videos remain visible.
 - [ ] **Sidebar Customization (Dynamic Detection):** Open the left sidebar on YouTube, then open the extension popup (click **Scan** if needed). Toggle **Kids**, **Movies & TV**, **News**, **Sports**, **Gaming**, **Music**, **Podcasts**, **Live**, **Shopping**, or any account-specific item ON/OFF and verify each hides/shows independently—and subscribed creator channels remain visible.
 - [ ] **Master Switch & Persistence:** Customize several toggles, flip the **Master** switch OFF, verify all blocked elements reappear immediately and the extension icon displays `OFF`, then flip **Master** back ON and confirm your exact prior configuration returns. Restart Chrome and verify all settings persist.
 - [ ] **Restore Defaults:** Click **Restore Defaults** in the popup footer and confirm defaults return (`Master: ON`, core blockers `ON`, `Hide Shorts in subscriptions: OFF`, sidebar items `Visible`).

@@ -53,12 +53,13 @@
       html.setAttribute('data-ytb-trending', settings.features.blockTrending ? 'true' : 'false');
       html.setAttribute('data-ytb-premium', settings.features.blockPremium ? 'true' : 'false');
       html.setAttribute('data-ytb-members', settings.features.blockMembersOnly ? 'true' : 'false');
+      html.setAttribute('data-ytb-playables', settings.features.blockPlayables ? 'true' : 'false');
       html.setAttribute('data-ytb-route', currentRoute());
 
       updateSidebarStyle();
       updateGuideSections();
       updateContinuationHelpers();
-      updateTrendingNotice();
+      updateBlockedPageBanners();
     }
 
     function ensureSidebarStyleElement() {
@@ -109,6 +110,7 @@
       if (settings.features.blockShortsTab && entryEl.getAttribute('data-ytb-shorts-tab-item') === 'true') return true;
       if (settings.features.blockTrending && entryEl.getAttribute('data-ytb-trending-item') === 'true') return true;
       if (settings.features.blockPremium && entryEl.getAttribute('data-ytb-premium-item') === 'true') return true;
+      if (settings.features.blockPlayables && entryEl.getAttribute('data-ytb-playables-item') === 'true') return true;
       var sidebarKey = entryEl.getAttribute('data-ytb-sidebar-key');
       if (sidebarKey && settings.sidebarHidden[sidebarKey]) return true;
       return false;
@@ -322,27 +324,46 @@
       return wrap;
     }
 
-    function updateTrendingNotice() {
-      var route = currentRoute();
-      var trendingBrowse = doc.querySelector('ytd-browse[page-subtype="trending"]');
-      if (!trendingBrowse) return;
-
-      var existingBanner = trendingBrowse.querySelector('.ytb-blocked-page-banner');
-      if (settings.masterEnabled && settings.features.blockTrending && route === 'trending') {
+    function syncBlockedPageNotice(container, shouldShow, titleText, bodyText) {
+      if (!container) return;
+      var existingBanner = container.querySelector('.ytb-blocked-page-banner');
+      if (shouldShow) {
         if (!existingBanner) {
           var banner = doc.createElement('div');
           banner.className = 'ytb-blocked-page-banner';
           var title = doc.createElement('strong');
-          title.textContent = 'Trending is hidden';
+          title.textContent = titleText;
           var desc = doc.createElement('span');
-          desc.textContent = 'YouTube Distraction Blocker is hiding Trending content. Toggle "Trending content" off in the extension popup to restore it.';
+          desc.textContent = bodyText;
           banner.appendChild(title);
           banner.appendChild(desc);
-          trendingBrowse.appendChild(banner);
+          container.appendChild(banner);
         }
       } else if (existingBanner) {
         existingBanner.remove();
       }
+    }
+
+    function updateBlockedPageBanners() {
+      var route = currentRoute();
+      var trendingBrowse = doc.querySelector('ytd-browse[page-subtype="trending"]');
+      syncBlockedPageNotice(
+        trendingBrowse,
+        Boolean(settings.masterEnabled && settings.features.blockTrending && route === 'trending'),
+        'Trending is hidden',
+        'YouTube Distraction Blocker is hiding Trending content. Toggle "Trending content" off in the extension popup to restore it.'
+      );
+
+      var playablesBrowse = doc.querySelector('ytd-browse[page-subtype="playables"]') ||
+        (route === 'playables'
+          ? doc.querySelector('ytd-browse:not([page-subtype="home"]):not([page-subtype="subscriptions"]):not([page-subtype="trending"]):not([page-subtype="playlist"]):not([page-subtype="history"]):not([page-subtype="channels"])')
+          : null);
+      syncBlockedPageNotice(
+        playablesBrowse,
+        Boolean(settings.masterEnabled && settings.features.blockPlayables && route === 'playables'),
+        'YouTube Playables are hidden',
+        'YouTube Distraction Blocker is hiding Playables games. Toggle "YouTube Playables" off in the extension popup to restore them.'
+      );
     }
 
     function flushPending() {
@@ -468,7 +489,7 @@
       }
       updateGuideSections();
       updateContinuationHelpers();
-      updateTrendingNotice();
+      updateBlockedPageBanners();
     }
 
     function startObserver() {

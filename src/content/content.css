@@ -221,6 +221,8 @@ html[data-ytb-enabled="true"][data-ytb-trending="true"]
 }
 
 html[data-ytb-enabled="true"][data-ytb-trending="true"][data-ytb-route="trending"]
+  .ytb-blocked-page-banner,
+html[data-ytb-enabled="true"][data-ytb-playables="true"][data-ytb-route="playables"]
   .ytb-blocked-page-banner {
   display: flex;
   flex-direction: column;
@@ -311,7 +313,41 @@ html[data-ytb-enabled="true"][data-ytb-members="true"]
   display: none !important;
 }
 
-/* 7. Empty Sidebar Section Cleanup (only when all entries inside section are hidden) */
+/* 7. YouTube Playables Blocker */
+html[data-ytb-enabled="true"][data-ytb-playables="true"]
+  ytd-guide-entry-renderer:has(a[href="/playables"], a[href^="/playables?"], a[href^="/playables/"], a[title="Playables" i], a[aria-label="Playables" i]),
+html[data-ytb-enabled="true"][data-ytb-playables="true"]
+  ytd-mini-guide-entry-renderer:has(a[href="/playables"], a[href^="/playables?"], a[href^="/playables/"], a[title="Playables" i], a[aria-label="Playables" i]),
+html[data-ytb-enabled="true"][data-ytb-playables="true"]
+  ytd-rich-section-renderer:has(mini-game-card-view-model, ytd-mini-game-card-view-model, ytm-mini-game-card-view-model, a[href="/playables"], a[href^="/playables/"], a[href^="/playables?"]),
+html[data-ytb-enabled="true"][data-ytb-playables="true"]
+  ytd-rich-shelf-renderer:has(mini-game-card-view-model, ytd-mini-game-card-view-model, ytm-mini-game-card-view-model),
+html[data-ytb-enabled="true"][data-ytb-playables="true"]
+  grid-shelf-view-model:has(mini-game-card-view-model, ytd-mini-game-card-view-model, ytm-mini-game-card-view-model),
+html[data-ytb-enabled="true"][data-ytb-playables="true"]
+  ytd-shelf-renderer:has(mini-game-card-view-model, ytd-mini-game-card-view-model, ytm-mini-game-card-view-model),
+html[data-ytb-enabled="true"][data-ytb-playables="true"]
+  ytd-rich-item-renderer:has(mini-game-card-view-model, ytd-mini-game-card-view-model, ytm-mini-game-card-view-model, a[href="/playables"], a[href^="/playables/"], a[href^="/playables?"]),
+html[data-ytb-enabled="true"][data-ytb-playables="true"]
+  mini-game-card-view-model,
+html[data-ytb-enabled="true"][data-ytb-playables="true"]
+  ytd-mini-game-card-view-model,
+html[data-ytb-enabled="true"][data-ytb-playables="true"]
+  ytm-mini-game-card-view-model,
+html[data-ytb-enabled="true"][data-ytb-playables="true"]
+  ytd-browse[page-subtype="playables"] #primary,
+html[data-ytb-enabled="true"][data-ytb-playables="true"]
+  ytd-browse[page-subtype="playables"] #header,
+html[data-ytb-enabled="true"][data-ytb-playables="true"][data-ytb-route="playables"]
+  ytd-browse:not([page-subtype="home"]):not([page-subtype="subscriptions"]):not([page-subtype="trending"]):not([page-subtype="playlist"]):not([page-subtype="history"]):not([page-subtype="channels"]) #primary,
+html[data-ytb-enabled="true"][data-ytb-playables="true"][data-ytb-route="playables"]
+  ytd-browse:not([page-subtype="home"]):not([page-subtype="subscriptions"]):not([page-subtype="trending"]):not([page-subtype="playlist"]):not([page-subtype="history"]):not([page-subtype="channels"]) #header,
+html[data-ytb-enabled="true"][data-ytb-playables="true"]
+  [data-ytb-playables-item="true"] {
+  display: none !important;
+}
+
+/* 8. Empty Sidebar Section Cleanup (only when all entries inside section are hidden) */
 html[data-ytb-enabled="true"]
   ytd-guide-section-renderer[data-ytb-empty-section="true"] {
   display: none !important;
