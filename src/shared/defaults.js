@@ -21,24 +21,24 @@
       defaultValue: true
     },
     {
-      id: 'blockShortsTab',
-      group: 'shorts',
-      label: 'Shorts navigation tab',
-      description: 'Hide the Shorts button and tabs across sidebar, mini-guide, and channel pages.',
-      defaultValue: true
-    },
-    {
       id: 'blockHomepageShorts',
       group: 'shorts',
-      label: 'Homepage Shorts',
+      label: 'Hide Shorts on homepage',
       description: 'Remove Shorts shelves, grids, and Shorts cards from the YouTube homepage.',
       defaultValue: true
     },
     {
-      id: 'blockFeedShorts',
+      id: 'blockShortsTab',
       group: 'shorts',
-      label: 'Search & feed Shorts',
-      description: 'Also hide Shorts shelves and Shorts cards in Search, Subscriptions, and Watch sidebar.',
+      label: 'Hide Shorts tab in sidebar',
+      description: 'Hide the Shorts button and tabs in the left sidebar, mini-guide, and channel tabs.',
+      defaultValue: true
+    },
+    {
+      id: 'blockSubscriptionShorts',
+      group: 'shorts',
+      label: 'Hide Shorts in subscriptions',
+      description: 'Hide Shorts shelves and Shorts videos in your Subscriptions feed (OFF by default so they stay visible).',
       defaultValue: false
     },
     {

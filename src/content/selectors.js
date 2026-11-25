@@ -389,8 +389,8 @@
       }
     }
     if (tag === 'yt-chip-cloud-chip-renderer') {
-      // Only hide Shorts chip inside browse feeds, never on Search where user might search "shorts".
-      if (el.closest('ytd-browse') && matchesExactPhrase(getTextSafe(el), SHORTS_TAB_LABELS)) {
+      // Only hide Shorts filter chip on Home browse, keeping Subscriptions & Search chips intact.
+      if (el.closest('ytd-browse[page-subtype="home"]') && matchesExactPhrase(getTextSafe(el), SHORTS_TAB_LABELS)) {
         return true;
       }
       return false;
@@ -519,11 +519,14 @@
 
     if (el.matches && el.matches(SELECTORS.SHELF)) {
       var shelfContainer = el.closest('ytd-rich-section-renderer') || el;
-      var inHome = route === 'home' || Boolean(shelfContainer.closest('ytd-browse[page-subtype="home"]'));
+      var inHome = Boolean(shelfContainer.closest('ytd-browse[page-subtype="home"]')) ||
+        (route === 'home' && !shelfContainer.closest('ytd-browse[page-subtype="subscriptions"], ytd-search'));
+      var inSubscriptions = Boolean(shelfContainer.closest('ytd-browse[page-subtype="subscriptions"]')) ||
+        (route === 'subscriptions' && !shelfContainer.closest('ytd-browse[page-subtype="home"], ytd-search'));
       var isShortsShelf = isShortsCardOrShelf(shelfContainer);
 
       setBooleanAttr(shelfContainer, 'data-ytb-home-shorts-item', inHome && isShortsShelf);
-      setBooleanAttr(shelfContainer, 'data-ytb-feed-shorts-item', !inHome && isShortsShelf);
+      setBooleanAttr(shelfContainer, 'data-ytb-subscription-shorts-item', inSubscriptions && isShortsShelf);
       setBooleanAttr(shelfContainer, 'data-ytb-trending-item', isTrendingShelfOrChip(shelfContainer));
       setBooleanAttr(shelfContainer, 'data-ytb-premium-item', isPremiumPromoElement(shelfContainer));
       setBooleanAttr(shelfContainer, 'data-ytb-members-item', isMembersOnlyShelf(shelfContainer));
@@ -532,11 +535,14 @@
 
     if (el.matches && el.matches(SELECTORS.VIDEO_CARD)) {
       var targetCard = getOutermostCard(el);
-      var cardInHome = route === 'home' || Boolean(targetCard.closest('ytd-browse[page-subtype="home"]'));
+      var cardInHome = Boolean(targetCard.closest('ytd-browse[page-subtype="home"]')) ||
+        (route === 'home' && !targetCard.closest('ytd-browse[page-subtype="subscriptions"], ytd-search'));
+      var cardInSubscriptions = Boolean(targetCard.closest('ytd-browse[page-subtype="subscriptions"]')) ||
+        (route === 'subscriptions' && !targetCard.closest('ytd-browse[page-subtype="home"], ytd-search'));
       var cardIsShorts = isShortsCardOrShelf(targetCard);
 
       setBooleanAttr(targetCard, 'data-ytb-home-shorts-item', cardInHome && cardIsShorts);
-      setBooleanAttr(targetCard, 'data-ytb-feed-shorts-item', !cardInHome && cardIsShorts);
+      setBooleanAttr(targetCard, 'data-ytb-subscription-shorts-item', cardInSubscriptions && cardIsShorts);
       setBooleanAttr(targetCard, 'data-ytb-premium-item', isPremiumCard(targetCard));
       setBooleanAttr(targetCard, 'data-ytb-members-item', isMembersOnlyCard(targetCard));
       return null;

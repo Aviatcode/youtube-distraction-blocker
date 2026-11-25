@@ -119,7 +119,7 @@ async function runAll() {
     assert.strictEqual(defaults.features.blockInfiniteScroll, true);
     assert.strictEqual(defaults.features.blockShortsTab, true);
     assert.strictEqual(defaults.features.blockHomepageShorts, true);
-    assert.strictEqual(defaults.features.blockFeedShorts, false);
+    assert.strictEqual(defaults.features.blockSubscriptionShorts, false);
     assert.strictEqual(defaults.features.blockTrending, true);
     assert.strictEqual(defaults.features.blockPremium, true);
     assert.strictEqual(defaults.features.blockMembersOnly, true);
@@ -480,20 +480,36 @@ async function runAll() {
     ctrl.destroy();
   });
 
-  await test('DOM controller: Independent Shorts toggles (tab vs homepage vs search/feed) and statement banner distinction', function () {
+  await test('DOM controller: Independent Shorts toggles (homepage vs sidebar tab vs subscriptions) and statement banner distinction', function () {
     var doc = new domMock.MockDocument();
-    var win = createMockWindow('/results');
+    var win = createMockWindow('/feed/subscriptions');
     var el = domMock.el;
 
+    var subShort = el(doc, 'ytd-rich-item-renderer', { id: 'sub-short' }, [
+      el(doc, 'a', { href: '/shorts/s999' }, [], 'Creator Short')
+    ]);
+    var subShortsShelf = el(doc, 'ytd-rich-section-renderer', { id: 'sub-shorts-shelf' }, [
+      el(doc, 'ytd-reel-shelf-renderer', {}, [
+        el(doc, 'a', { href: '/shorts/s888' }, [], 'Shelf Short')
+      ])
+    ]);
+    var subShortsChip = el(doc, 'yt-chip-cloud-chip-renderer', { id: 'sub-chip' }, [], 'Shorts');
+    var subsBrowse = el(doc, 'ytd-browse', { 'page-subtype': 'subscriptions' }, [subShortsChip, subShortsShelf, subShort]);
+
+    var homeShort = el(doc, 'ytd-rich-item-renderer', { id: 'home-short' }, [
+      el(doc, 'a', { href: '/shorts/h111' }, [], 'Home Short')
+    ]);
+    var homeShortsChip = el(doc, 'yt-chip-cloud-chip-renderer', { id: 'home-chip' }, [], 'Shorts');
+    var homeBrowse = el(doc, 'ytd-browse', { 'page-subtype': 'home' }, [homeShortsChip, homeShort]);
+
+    var channelTab = el(doc, 'yt-tab-shape', { id: 'chan-shorts-tab', 'tab-title': 'Shorts' }, [], 'Shorts');
+    var browseSection = el(doc, 'ytd-browse', { 'page-subtype': 'channels' }, [channelTab]);
+
     var searchShort = el(doc, 'ytd-video-renderer', { id: 'search-short' }, [
-      el(doc, 'a', { href: '/shorts/s999' }, [], 'Quick clip')
+      el(doc, 'a', { href: '/shorts/q222' }, [], 'Search Short')
     ]);
     var searchShortsChip = el(doc, 'yt-chip-cloud-chip-renderer', { id: 'search-chip' }, [], 'Shorts');
     var searchSection = el(doc, 'ytd-search', {}, [searchShortsChip, searchShort]);
-
-    var browseShortsChip = el(doc, 'yt-chip-cloud-chip-renderer', { id: 'browse-chip' }, [], 'Shorts');
-    var channelTab = el(doc, 'yt-tab-shape', { id: 'chan-shorts-tab', 'tab-title': 'Shorts' }, [], 'Shorts');
-    var browseSection = el(doc, 'ytd-browse', { 'page-subtype': 'channels' }, [browseShortsChip, channelTab]);
 
     var premBanner = el(doc, 'ytd-statement-banner-renderer', { id: 'prem-banner' }, [
       el(doc, 'a', { href: '/premium' }, [], 'Try YouTube Premium')
@@ -502,24 +518,43 @@ async function runAll() {
       el(doc, 'a', { href: '/creator-update' }, [], 'Creator community spotlight')
     ]);
 
-    doc.body.appendChild(searchSection);
+    doc.body.appendChild(subsBrowse);
+    doc.body.appendChild(homeBrowse);
     doc.body.appendChild(browseSection);
+    doc.body.appendChild(searchSection);
     doc.body.appendChild(premBanner);
     doc.body.appendChild(infoBanner);
 
     var ctrl = controllerMod.createController({ document: doc, window: win });
     var settings = YTB.createDefaultSettings();
-    settings.features.blockHomepageShorts = false;
-    settings.features.blockFeedShorts = true;
     ctrl.init(settings);
 
-    assert.strictEqual(doc.documentElement.getAttribute('data-ytb-homepage-shorts'), 'false');
-    assert.strictEqual(doc.documentElement.getAttribute('data-ytb-feed-shorts'), 'true');
-    assert.strictEqual(doc.getElementById('search-short').getAttribute('data-ytb-feed-shorts-item'), 'true');
+    // By default: Homepage Shorts ON, Sidebar Shorts tab ON, Subscriptions Shorts OFF (visible).
+    assert.strictEqual(doc.documentElement.getAttribute('data-ytb-homepage-shorts'), 'true');
+    assert.strictEqual(doc.documentElement.getAttribute('data-ytb-shorts-tab'), 'true');
+    assert.strictEqual(doc.documentElement.getAttribute('data-ytb-subscription-shorts'), 'false');
+
+    // Home short tagged as homepage-only; Sub short tagged as subscription-only (and NOT hidden while flag is false).
+    assert.strictEqual(doc.getElementById('home-short').getAttribute('data-ytb-home-shorts-item'), 'true');
+    assert.strictEqual(doc.getElementById('home-short').hasAttribute('data-ytb-subscription-shorts-item'), false);
+    assert.strictEqual(doc.getElementById('sub-short').getAttribute('data-ytb-subscription-shorts-item'), 'true');
+    assert.strictEqual(doc.getElementById('sub-short').hasAttribute('data-ytb-home-shorts-item'), false);
+    assert.strictEqual(doc.getElementById('sub-shorts-shelf').getAttribute('data-ytb-subscription-shorts-item'), 'true');
+    assert.strictEqual(doc.getElementById('sub-shorts-shelf').hasAttribute('data-ytb-home-shorts-item'), false);
+
+    // Subscriptions Shorts chip and Search Shorts chip are preserved; Home chip & Channel Shorts tab are tagged.
     assert.strictEqual(doc.getElementById('chan-shorts-tab').getAttribute('data-ytb-shorts-tab-item'), 'true');
-    assert.strictEqual(doc.getElementById('browse-chip').getAttribute('data-ytb-shorts-tab-item'), 'true');
-    // Search "Shorts" chip must NOT be hidden as a tab.
+    assert.strictEqual(doc.getElementById('home-chip').getAttribute('data-ytb-shorts-tab-item'), 'true');
+    assert.strictEqual(doc.getElementById('sub-chip').hasAttribute('data-ytb-shorts-tab-item'), false);
     assert.strictEqual(doc.getElementById('search-chip').hasAttribute('data-ytb-shorts-tab-item'), false);
+    assert.strictEqual(doc.getElementById('search-short').hasAttribute('data-ytb-subscription-shorts-item'), false);
+
+    // Enabling blockSubscriptionShorts flips data-ytb-subscription-shorts to true without touching other flags.
+    settings.features.blockSubscriptionShorts = true;
+    ctrl.applySettings(settings);
+    assert.strictEqual(doc.documentElement.getAttribute('data-ytb-subscription-shorts'), 'true');
+    assert.strictEqual(doc.documentElement.getAttribute('data-ytb-homepage-shorts'), 'true');
+
     // Premium banner tagged, neutral announcement banner untouched.
     assert.strictEqual(doc.getElementById('prem-banner').getAttribute('data-ytb-premium-item'), 'true');
     assert.strictEqual(doc.getElementById('info-banner').hasAttribute('data-ytb-premium-item'), false);

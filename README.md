@@ -8,10 +8,10 @@ A lightweight, privacy-first, plain JavaScript/HTML/CSS Chrome & Chromium extens
 
 1. **Infinite Scroll Blocker (Feed)**  
    Stops automatic endless feed loading on YouTube Home, Subscriptions, Channel grids, Search, and Watch Next recommendations—while keeping comments, playlists, normal navigation, and manual search working (including an explicit **Load more search results** button on Search).
-2. **Shorts Tab Blocker (Shorts)**  
-   Hides the Shorts button/tab in the left expanded sidebar, collapsed mini-guide, channel tabs, and mobile navigation bar.
-3. **Homepage Shorts Blocker (Shorts)**  
-   Removes Shorts shelves, Shorts grids, and Shorts cards from the YouTube homepage without touching long-form videos. Also includes an optional independent toggle for Shorts in Search & Feeds.
+2. **Shorts Controls (3 Independent Options)**  
+   - **Hide Shorts on homepage** (ON by default): Removes Shorts shelves, grids, and Shorts cards from the YouTube homepage without touching long-form videos.
+   - **Hide Shorts tab in sidebar** (ON by default): Hides the Shorts button/tab in the left expanded sidebar, collapsed mini-guide, channel tabs, and mobile navigation bar.
+   - **Hide Shorts in subscriptions** (OFF by default): Keeps Shorts from subscribed channels visible in Subscriptions unless you explicitly turn it ON.
 4. **Trending Blocker (Content Restrictions)**  
    Hides Trending/Explore Trending sidebar links, Trending feed shelves, and Trending pages (showing a non-intrusive notice if visited directly).
 5. **YouTube Premium Promo Blocker (Content Restrictions)**  
@@ -125,14 +125,14 @@ The automated suite verifies:
 Open `https://www.youtube.com/` after loading the unpacked extension and verify each item:
 
 - [ ] **Infinite Scroll Blocker (Home & Search):** Scroll to the bottom of Home (`/`). Verify endless video batches do **not** auto-load and the subtle *"Infinite scroll paused — end of loaded feed"* caption appears. Then search for a query (`/results?search_query=documentary`), scroll down, verify results stop auto-loading, and click **Load more search results** to confirm manual pagination loads the next batch cleanly. Open a video's comments section and a long playlist to confirm comments and playlists still load normally.
-- [ ] **Shorts Tab Blocker:** Confirm the **Shorts** entry disappears from the expanded left sidebar, collapsed mini-guide, and any channel's navigation tabs. Toggle **Shorts navigation tab** OFF in the popup and verify Shorts navigation reappears immediately without reloading.
-- [ ] **Homepage Shorts Blocker:** On YouTube Home, confirm Shorts shelves and Shorts video cards are removed while normal long-form video cards remain intact. Toggle **Homepage Shorts** OFF and confirm homepage Shorts return immediately.
+- [ ] **Shorts Tab Blocker:** Confirm the **Shorts** entry disappears from the expanded left sidebar, collapsed mini-guide, and any channel's navigation tabs. Toggle **Hide Shorts tab in sidebar** OFF in the popup and verify Shorts navigation reappears immediately without reloading.
+- [ ] **Homepage & Subscriptions Shorts:** On YouTube Home, confirm Shorts shelves and Shorts video cards are removed while normal long-form video cards remain intact. Open **Subscriptions** (`/feed/subscriptions`) and confirm subscribed creators' Shorts remain visible by default; toggle **Hide Shorts in subscriptions** ON to verify they hide, and back OFF to restore them immediately.
 - [ ] **Trending Blocker:** Confirm **Trending** disappears from the sidebar Explore section (while Music, Gaming, Sports, etc. remain unaffected). Navigate directly to `https://www.youtube.com/feed/trending` and confirm Trending videos are hidden and the clean notice banner appears.
 - [ ] **Premium Content Blocker:** Confirm **YouTube Premium** disappears from the left sidebar, and any Premium homepage banners/mealbars/upsell dialogs are hidden without freezing page clicks. Search for `"premium review"` and confirm normal creator videos mentioning "Premium" in their title are **not** blocked.
 - [ ] **Members-Only Blocker:** Visit a channel that posts Members-only videos or community posts. Confirm items carrying a **Members only** badge are hidden, while the same channel's ordinary public videos remain visible.
 - [ ] **Sidebar Customization (Dynamic Detection):** Open the left sidebar on YouTube, then open the extension popup (click **Scan** if needed). Toggle **Kids**, **Movies & TV**, **News**, **Sports**, **Gaming**, **Music**, **Podcasts**, **Live**, **Shopping**, or any account-specific item ON/OFF and verify each hides/shows independently—and subscribed creator channels remain visible.
 - [ ] **Master Switch & Persistence:** Customize several toggles, flip the **Master** switch OFF, verify all blocked elements reappear immediately and the extension icon displays `OFF`, then flip **Master** back ON and confirm your exact prior configuration returns. Restart Chrome and verify all settings persist.
-- [ ] **Restore Defaults:** Click **Restore Defaults** in the popup footer and confirm defaults return (`Master: ON`, core blockers `ON`, `Search & feed Shorts: OFF`, sidebar items `Visible`).
+- [ ] **Restore Defaults:** Click **Restore Defaults** in the popup footer and confirm defaults return (`Master: ON`, core blockers `ON`, `Hide Shorts in subscriptions: OFF`, sidebar items `Visible`).
 - [ ] **Playback & Theme Integrity:** Play a video in both YouTube Light Theme and Dark Theme, switch quality/captions/fullscreen, and verify zero lag, stutter, or UI glitches.
 
 ---

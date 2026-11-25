@@ -49,7 +49,7 @@
       html.setAttribute('data-ytb-infinite-scroll', settings.features.blockInfiniteScroll ? 'true' : 'false');
       html.setAttribute('data-ytb-shorts-tab', settings.features.blockShortsTab ? 'true' : 'false');
       html.setAttribute('data-ytb-homepage-shorts', settings.features.blockHomepageShorts ? 'true' : 'false');
-      html.setAttribute('data-ytb-feed-shorts', settings.features.blockFeedShorts ? 'true' : 'false');
+      html.setAttribute('data-ytb-subscription-shorts', settings.features.blockSubscriptionShorts ? 'true' : 'false');
       html.setAttribute('data-ytb-trending', settings.features.blockTrending ? 'true' : 'false');
       html.setAttribute('data-ytb-premium', settings.features.blockPremium ? 'true' : 'false');
       html.setAttribute('data-ytb-members', settings.features.blockMembersOnly ? 'true' : 'false');
