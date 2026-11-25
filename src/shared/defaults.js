@@ -9,7 +9,8 @@
   var FEATURE_GROUPS = Object.freeze([
     { id: 'feed', title: 'Feed' },
     { id: 'shorts', title: 'Shorts' },
-    { id: 'restrictions', title: 'Content Restrictions' }
+    { id: 'restrictions', title: 'Content Restrictions' },
+    { id: 'player', title: 'Player' }
   ]);
 
   var FEATURE_DEFINITIONS = Object.freeze([
@@ -68,6 +69,13 @@
       label: 'YouTube Playables',
       description: 'Hide Playables mini-games, homepage shelves, sidebar links, and Playables pages.',
       defaultValue: true
+    },
+    {
+      id: 'autoTheaterMode',
+      group: 'player',
+      label: 'Auto theater mode',
+      description: 'Automatically switch video watch pages to Theater mode (preserves manual exits per video).',
+      defaultValue: false
     }
   ]);
 

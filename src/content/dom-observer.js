@@ -31,6 +31,8 @@
     var discoveredBuffer = [];
     var discoveredSeen = Object.create(null);
     var needsRescanOnResume = false;
+    var theaterTimer = null;
+    var lastAutoTheaterKey = null;
     var destroyed = false;
 
     function getRoot() {
@@ -515,11 +517,127 @@
       pendingNodes.clear();
     }
 
+    function getWatchVideoKey() {
+      var loc = win.location || {};
+      var search = String(loc.search || '');
+      try {
+        var params = new URLSearchParams(search);
+        var v = params.get('v');
+        if (v) return v;
+      } catch (_) {
+        // Fallback when URLSearchParams is unavailable.
+      }
+      return String(loc.pathname || '') + search;
+    }
+
+    function cancelTheaterTimer() {
+      if (theaterTimer !== null) {
+        win.clearTimeout(theaterTimer);
+        theaterTimer = null;
+      }
+    }
+
+    function tryEnableTheaterOnce(videoKey) {
+      if (destroyed || !settings.masterEnabled || !settings.features.autoTheaterMode) {
+        return 'stop';
+      }
+      if (currentRoute() !== 'watch') {
+        return 'stop';
+      }
+      var watchFlexy = doc.querySelector('ytd-watch-flexy');
+      if (!watchFlexy || watchFlexy.hasAttribute('hidden')) {
+        return 'retry';
+      }
+      if (watchFlexy.hasAttribute('fullscreen') || doc.fullscreenElement) {
+        lastAutoTheaterKey = videoKey;
+        return 'done';
+      }
+      if (watchFlexy.hasAttribute('miniplayer')) {
+        return 'retry';
+      }
+      if (watchFlexy.hasAttribute('theater')) {
+        lastAutoTheaterKey = videoKey;
+        return 'done';
+      }
+
+      var sizeBtn = watchFlexy.querySelector('.ytp-size-button') || doc.querySelector('#movie_player .ytp-size-button');
+      if (!sizeBtn || sizeBtn.disabled || typeof sizeBtn.click !== 'function') {
+        return 'retry';
+      }
+      if (sizeBtn.getAttribute('aria-pressed') === 'true') {
+        lastAutoTheaterKey = videoKey;
+        return 'done';
+      }
+
+      sizeBtn.click();
+      if (watchFlexy.hasAttribute('theater')) {
+        lastAutoTheaterKey = videoKey;
+        return 'done';
+      }
+      return 'verify';
+    }
+
+    function ensureAutoTheater() {
+      cancelTheaterTimer();
+      if (destroyed || !settings.masterEnabled || !settings.features.autoTheaterMode) return;
+      if (currentRoute() !== 'watch') return;
+
+      var videoKey = getWatchVideoKey();
+      if (lastAutoTheaterKey === videoKey) return;
+
+      var attempts = 0;
+      var maxAttempts = 10;
+
+      function step() {
+        theaterTimer = null;
+        if (destroyed || !settings.masterEnabled || !settings.features.autoTheaterMode) return;
+        if (currentRoute() !== 'watch') return;
+        var currentKey = getWatchVideoKey();
+        if (lastAutoTheaterKey === currentKey) return;
+
+        var status = tryEnableTheaterOnce(currentKey);
+        if (status === 'done' || status === 'stop') return;
+
+        if (status === 'verify') {
+          attempts++;
+          if (attempts >= 3) {
+            lastAutoTheaterKey = currentKey;
+            return;
+          }
+          theaterTimer = win.setTimeout(function () {
+            theaterTimer = null;
+            var wf = doc.querySelector('ytd-watch-flexy');
+            if (wf && wf.hasAttribute('theater')) {
+              lastAutoTheaterKey = currentKey;
+              return;
+            }
+            step();
+          }, 180);
+          return;
+        }
+
+        attempts++;
+        if (attempts < maxAttempts) {
+          theaterTimer = win.setTimeout(step, 180);
+        }
+      }
+
+      step();
+    }
+
     function applySettings(nextSettings) {
       var prevMaster = settings.masterEnabled;
       var prevInfinite = settings.features.blockInfiniteScroll;
+      var prevAutoTheater = settings.features.autoTheaterMode;
       settings = YTB.normalizeSettings(nextSettings);
       applyRootAttributes();
+
+      if (!settings.masterEnabled || !settings.features.autoTheaterMode) {
+        cancelTheaterTimer();
+      }
+      if ((!prevMaster && settings.masterEnabled) || (!prevAutoTheater && settings.features.autoTheaterMode)) {
+        lastAutoTheaterKey = null;
+      }
 
       if (!doc.body) return;
 
@@ -529,6 +647,9 @@
         needsRescanOnResume = false;
         scanVisibleCandidates();
       }
+      if (settings.masterEnabled && settings.features.autoTheaterMode) {
+        ensureAutoTheater();
+      }
     }
 
     function handleNavigation() {
@@ -536,6 +657,7 @@
       if (doc.body) {
         scanVisibleCandidates();
       }
+      ensureAutoTheater();
     }
 
     function init(initialSettings) {
@@ -547,10 +669,12 @@
           doc.removeEventListener('DOMContentLoaded', onReady);
           startObserver();
           scanVisibleCandidates();
+          ensureAutoTheater();
         });
       } else {
         startObserver();
         scanVisibleCandidates();
+        ensureAutoTheater();
       }
     }
 
@@ -567,6 +691,7 @@
         win.clearTimeout(sidebarSyncTimer);
         sidebarSyncTimer = null;
       }
+      cancelTheaterTimer();
     }
 
     function pause() {
@@ -580,6 +705,7 @@
       if (doc.body) {
         startObserver();
         scanVisibleCandidates();
+        ensureAutoTheater();
       }
     }
 

@@ -125,6 +125,7 @@ async function runAll() {
     assert.strictEqual(defaults.features.blockPremium, true);
     assert.strictEqual(defaults.features.blockMembersOnly, true);
     assert.strictEqual(defaults.features.blockPlayables, true);
+    assert.strictEqual(defaults.features.autoTheaterMode, false);
     assert.deepStrictEqual(defaults.sidebarHidden, {});
 
     var normalized = YTB.normalizeSettings({
@@ -710,6 +711,65 @@ async function runAll() {
 
     ctrl1.destroy();
     ctrl2.destroy();
+  });
+
+  await test('DOM controller: Auto theater mode enters theater once per video and respects manual exits & fullscreen', function () {
+    var doc = new domMock.MockDocument();
+    var win = createMockWindow('/watch');
+    win.location.search = '?v=vid1';
+    var el = domMock.el;
+
+    var sizeBtn = el(doc, 'button', { class: 'ytp-size-button', 'aria-pressed': 'false' }, [], 'Theater');
+    var watchFlexy = el(doc, 'ytd-watch-flexy', {}, [
+      el(doc, 'div', { id: 'movie_player' }, [sizeBtn])
+    ]);
+    sizeBtn.addEventListener('click', function () {
+      if (watchFlexy.hasAttribute('theater')) {
+        watchFlexy.removeAttribute('theater');
+        sizeBtn.setAttribute('aria-pressed', 'false');
+      } else {
+        watchFlexy.setAttribute('theater', '');
+        sizeBtn.setAttribute('aria-pressed', 'true');
+      }
+    });
+    doc.body.appendChild(watchFlexy);
+
+    var ctrl = controllerMod.createController({ document: doc, window: win });
+    var settings = YTB.createDefaultSettings();
+
+    // Off by default -> does not click theater button.
+    ctrl.init(settings);
+    assert.strictEqual(watchFlexy.hasAttribute('theater'), false);
+    assert.strictEqual(sizeBtn.clickedCount || 0, 0);
+
+    // Turning autoTheaterMode ON switches current watch page into theater mode immediately.
+    settings.features.autoTheaterMode = true;
+    ctrl.applySettings(settings);
+    assert.strictEqual(watchFlexy.hasAttribute('theater'), true);
+    assert.strictEqual(sizeBtn.clickedCount, 1);
+
+    // User manually exits theater mode on vid1 -> SPA event for same video must NOT force theater back.
+    sizeBtn.click();
+    assert.strictEqual(watchFlexy.hasAttribute('theater'), false);
+    assert.strictEqual(sizeBtn.clickedCount, 2);
+    ctrl.handleNavigation();
+    assert.strictEqual(watchFlexy.hasAttribute('theater'), false);
+    assert.strictEqual(sizeBtn.clickedCount, 2);
+
+    // Navigating to a new video (vid2) re-enables theater mode automatically.
+    win.location.search = '?v=vid2';
+    ctrl.handleNavigation();
+    assert.strictEqual(watchFlexy.hasAttribute('theater'), true);
+    assert.strictEqual(sizeBtn.clickedCount, 3);
+
+    // If fullscreen is active on a new video (vid3), do NOT click size button.
+    watchFlexy.removeAttribute('theater');
+    watchFlexy.setAttribute('fullscreen', '');
+    win.location.search = '?v=vid3';
+    ctrl.handleNavigation();
+    assert.strictEqual(sizeBtn.clickedCount, 3);
+
+    ctrl.destroy();
   });
 
   console.log('\nSummary: ' + passed + ' passed, ' + failed + ' failed.');
