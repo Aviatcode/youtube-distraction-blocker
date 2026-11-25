@@ -5,7 +5,12 @@
   "version": "1.0.0",
   "description": "Lightweight, local-only distraction blocker for YouTube: stop infinite scroll, Shorts, Trending, Premium upsells, Members-only items, and sidebar clutter.",
   "permissions": [
-    "storage"
+    "storage",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://www.youtube.com/*",
+    "https://m.youtube.com/*"
   ],
   "icons": {
     "16": "assets/icons/icon16.png",

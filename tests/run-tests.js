@@ -72,7 +72,8 @@ async function runAll() {
     var manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
 
     assert.strictEqual(manifest.manifest_version, 3);
-    assert.deepStrictEqual(manifest.permissions, ['storage']);
+    assert.deepStrictEqual(manifest.permissions, ['storage', 'scripting']);
+    assert.deepStrictEqual(manifest.host_permissions, ['https://www.youtube.com/*', 'https://m.youtube.com/*']);
     assert.ok(manifest.action && manifest.action.default_popup);
     assert.ok(manifest.background && manifest.background.service_worker);
     assert.ok(manifest.options_ui && manifest.options_ui.page);
@@ -653,6 +654,62 @@ async function runAll() {
     assert.strictEqual(doc.querySelector('.ytb-blocked-page-banner'), null);
 
     ctrl.destroy();
+  });
+
+  await test('Multi-tab controller sync and bfcache pause/resume lifecycle', function () {
+    var el = domMock.el;
+
+    // Tab 1: YouTube Home
+    var doc1 = new domMock.MockDocument();
+    var win1 = createMockWindow('/');
+    var homeShort = el(doc1, 'ytd-rich-item-renderer', { id: 't1-short' }, [
+      el(doc1, 'a', { href: '/shorts/s1' }, [], 'Short 1')
+    ]);
+    doc1.body.appendChild(el(doc1, 'ytd-browse', { 'page-subtype': 'home' }, [homeShort]));
+
+    // Tab 2: YouTube Subscriptions (opened in background while paused)
+    var doc2 = new domMock.MockDocument();
+    var win2 = createMockWindow('/feed/subscriptions');
+    var subMemCard = el(doc2, 'ytd-rich-item-renderer', { id: 't2-mem' }, [
+      el(doc2, 'badge-shape', {}, [], 'Members only')
+    ]);
+    var subBrowse = el(doc2, 'ytd-browse', { 'page-subtype': 'subscriptions' }, [subMemCard]);
+    doc2.body.appendChild(subBrowse);
+
+    var ctrl1 = controllerMod.createController({ document: doc1, window: win1 });
+    var ctrl2 = controllerMod.createController({ document: doc2, window: win2 });
+
+    var pausedSettings = YTB.createDefaultSettings();
+    pausedSettings.masterEnabled = false;
+    ctrl1.init(pausedSettings);
+    ctrl2.init(pausedSettings);
+
+    // While paused, cards are skipped and root attr is false across both tabs.
+    assert.strictEqual(doc1.documentElement.getAttribute('data-ytb-enabled'), 'false');
+    assert.strictEqual(doc2.documentElement.getAttribute('data-ytb-enabled'), 'false');
+    assert.strictEqual(subMemCard.hasAttribute('data-ytb-members-item'), false);
+
+    // Master switch turned ON -> both tabs apply settings and Tab 2 scans previously skipped card.
+    var activeSettings = YTB.createDefaultSettings();
+    ctrl1.applySettings(activeSettings);
+    ctrl2.applySettings(activeSettings);
+    assert.strictEqual(doc1.documentElement.getAttribute('data-ytb-enabled'), 'true');
+    assert.strictEqual(doc2.documentElement.getAttribute('data-ytb-enabled'), 'true');
+    assert.strictEqual(homeShort.getAttribute('data-ytb-home-shorts-item'), 'true');
+    assert.strictEqual(subMemCard.getAttribute('data-ytb-members-item'), 'true');
+
+    // Simulate bfcache pause() + resume() on Tab 2 and verify new mutations still get observed.
+    ctrl2.pause();
+    ctrl2.resume();
+    var lateCard = el(doc2, 'ytd-rich-item-renderer', { id: 't2-late-playables' }, [
+      el(doc2, 'mini-game-card-view-model', {}, [], 'Playable')
+    ]);
+    subBrowse.appendChild(lateCard);
+    ctrl2.flushPending();
+    assert.strictEqual(lateCard.getAttribute('data-ytb-playables-item'), 'true');
+
+    ctrl1.destroy();
+    ctrl2.destroy();
   });
 
   console.log('\nSummary: ' + passed + ' passed, ' + failed + ' failed.');

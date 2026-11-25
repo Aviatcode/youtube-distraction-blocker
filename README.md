@@ -31,16 +31,16 @@ A lightweight, privacy-first, plain JavaScript/HTML/CSS Chrome & Chromium extens
 
 ```text
 Youtubeblocker/
-├── manifest.json                   # MV3 manifest: minimal "storage" permission, YouTube-only content scripts at document_start
+├── manifest.json                   # MV3 manifest: "storage" + "scripting" permissions, YouTube-only host scope at document_start
 ├── assets/icons/                   # Extension PNG icons (16, 32, 48, 128)
 ├── src/
 │   ├── shared/
 │   │   ├── defaults.js             # Default settings schema, feature metadata, canonical sidebar catalog & normalizer
 │   │   ├── storage.js              # Isolated chrome.storage.local wrapper (settings vs discovered sidebar keys)
-│   │   ├── dashboard-ui.js         # Shared UI controller for popup & options (switches, sidebar filter, Restore Defaults)
+│   │   ├── dashboard-ui.js         # Shared UI controller for popup & options (switches, multi-tab scan, Restore Defaults)
 │   │   └── ui.css                  # Shared adaptive light/dark UI styling
 │   ├── background/
-│   │   └── service-worker.js       # Minimal event-driven MV3 worker: initializes defaults & shows "OFF" badge when paused
+│   │   └── service-worker.js       # Event-driven MV3 worker: injects into existing YouTube tabs, broadcasts settings across all tabs, serializes sidebar merges, updates "OFF" badge
 │   ├── content/
 │   │   ├── content.css             # Zero-JS attribute & :has() CSS hiding rules + light/dark YouTube theme UI styles
 │   │   ├── selectors.js            # Centralized YouTube DOM selectors, badge/promo/Shorts classifiers, sidebar extractor
@@ -134,7 +134,7 @@ Open `https://www.youtube.com/` after loading the unpacked extension and verify 
 - [ ] **Members-Only Blocker:** Visit a channel that posts Members-only videos or community posts. Confirm items carrying a **Members only** badge are hidden, while the same channel's ordinary public videos remain visible.
 - [ ] **YouTube Playables Blocker:** Confirm **Playables** disappears from the sidebar Explore section and Playables game shelves/cards disappear from Home (and `/playables` shows the blocked notice), while ordinary gaming videos remain visible.
 - [ ] **Sidebar Customization (Dynamic Detection):** Open the left sidebar on YouTube, then open the extension popup (click **Scan** if needed). Toggle **Kids**, **Movies & TV**, **News**, **Sports**, **Gaming**, **Music**, **Podcasts**, **Live**, **Shopping**, or any account-specific item ON/OFF and verify each hides/shows independently—and subscribed creator channels remain visible.
-- [ ] **Master Switch & Persistence:** Customize several toggles, flip the **Master** switch OFF, verify all blocked elements reappear immediately and the extension icon displays `OFF`, then flip **Master** back ON and confirm your exact prior configuration returns. Restart Chrome and verify all settings persist.
+- [ ] **Master Switch, Multi-Tab Sync & Persistence:** Open 2–3 YouTube tabs across Chrome windows, toggle features or flip the **Master** switch OFF/ON in the popup, and confirm every open YouTube tab updates immediately without reloading (and backgrounded tabs stay synced when switched into focus). Restart Chrome and verify all settings persist.
 - [ ] **Restore Defaults:** Click **Restore Defaults** in the popup footer and confirm defaults return (`Master: ON`, core blockers `ON`, `Hide Shorts in subscriptions: OFF`, sidebar items `Visible`).
 - [ ] **Playback & Theme Integrity:** Play a video in both YouTube Light Theme and Dark Theme, switch quality/captions/fullscreen, and verify zero lag, stutter, or UI glitches.
 

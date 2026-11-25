@@ -318,35 +318,44 @@
       renderSidebarList();
     }
 
-    function pingActiveYouTubeTab(rescan) {
-      if (typeof chrome === 'undefined' || !chrome.tabs) return;
+    function pingAllYouTubeTabs(rescan) {
+      if (typeof chrome === 'undefined' || !chrome.runtime || typeof chrome.runtime.sendMessage !== 'function') {
+        return;
+      }
       try {
-        chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-          if (chrome.runtime && chrome.runtime.lastError) return;
-          if (!tabs || !tabs[0]) return;
-          chrome.tabs.sendMessage(tabs[0].id, { type: 'YTB_PING_TAB', rescan: Boolean(rescan) }, function (res) {
-            if (chrome.runtime && chrome.runtime.lastError) {
-              return;
+        chrome.runtime.sendMessage({ type: 'YTB_SCAN_ALL_TABS', rescan: Boolean(rescan) }, function (res) {
+          if (chrome.runtime && chrome.runtime.lastError) {
+            return;
+          }
+          if (res && res.ok && res.tabCount > 0) {
+            if (res.tabCount === 1) {
+              var routeLabel = (res.routes && res.routes[0]) ? ' (' + res.routes[0] + ')' : '';
+              defaultFooterText = 'Synced · 1 YouTube tab' + routeLabel;
+            } else {
+              defaultFooterText = 'Synced · ' + res.tabCount + ' YouTube tabs';
             }
-            if (res && res.ok) {
-              defaultFooterText = 'Connected · YouTube (' + res.route + ')';
-              if (els.footerStatus && !els.footerStatus.classList.contains('is-toast')) {
-                els.footerStatus.textContent = defaultFooterText;
-              }
-              if (rescan) {
-                setTimeout(async function () {
-                  discoveredSidebar = await YTB.storage.getDiscoveredSidebarItems();
-                  renderSidebarList();
-                  showFooterToast('Sidebar scan refreshed');
-                }, 320);
-              }
-            } else if (rescan) {
+            if (els.footerStatus && !els.footerStatus.classList.contains('is-toast')) {
+              els.footerStatus.textContent = defaultFooterText;
+            }
+            if (rescan) {
+              setTimeout(async function () {
+                discoveredSidebar = await YTB.storage.getDiscoveredSidebarItems();
+                renderSidebarList();
+                showFooterToast('Scanned ' + res.tabCount + (res.tabCount === 1 ? ' YouTube tab' : ' YouTube tabs'));
+              }, 350);
+            }
+          } else {
+            defaultFooterText = 'Local settings · No YouTube tab open';
+            if (els.footerStatus && !els.footerStatus.classList.contains('is-toast')) {
+              els.footerStatus.textContent = defaultFooterText;
+            }
+            if (rescan) {
               showFooterToast('Open a YouTube tab to detect account items');
             }
-          });
+          }
         });
       } catch (_) {
-        // Ignore tab messaging errors when opened standalone.
+        // Ignore runtime messaging errors when opened standalone.
       }
     }
 
@@ -358,7 +367,7 @@
       currentSettings = results[0];
       discoveredSidebar = results[1];
       renderAll();
-      pingActiveYouTubeTab(false);
+      pingAllYouTubeTabs(false);
     }
 
     if (els.sidebarFilter) {
@@ -370,7 +379,7 @@
 
     if (els.refreshSidebarBtn) {
       els.refreshSidebarBtn.addEventListener('click', function () {
-        pingActiveYouTubeTab(true);
+        pingAllYouTubeTabs(true);
       });
     }
 

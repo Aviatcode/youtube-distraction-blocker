@@ -367,6 +367,9 @@
     }
 
     function flushPending() {
+      if (rafId !== null && typeof win.cancelAnimationFrame === 'function') {
+        win.cancelAnimationFrame(rafId);
+      }
       rafId = null;
       if (fallbackTimer !== null) {
         win.clearTimeout(fallbackTimer);
@@ -520,8 +523,8 @@
 
       if (!doc.body) return;
 
-      // Only scan the DOM if resuming from paused state or enabling infinite scroll on loaded continuations.
-      if ((!prevMaster && settings.masterEnabled && needsRescanOnResume) ||
+      // Scan when resuming from paused state or enabling infinite scroll on loaded continuations.
+      if ((!prevMaster && settings.masterEnabled) ||
           (!prevInfinite && settings.features.blockInfiniteScroll)) {
         needsRescanOnResume = false;
         scanVisibleCandidates();
@@ -551,14 +554,39 @@
       }
     }
 
-    function destroy() {
-      destroyed = true;
-      stopObserver();
+    function clearTimers() {
       if (rafId !== null && typeof win.cancelAnimationFrame === 'function') {
         win.cancelAnimationFrame(rafId);
       }
-      if (fallbackTimer !== null) win.clearTimeout(fallbackTimer);
-      if (sidebarSyncTimer !== null) win.clearTimeout(sidebarSyncTimer);
+      rafId = null;
+      if (fallbackTimer !== null) {
+        win.clearTimeout(fallbackTimer);
+        fallbackTimer = null;
+      }
+      if (sidebarSyncTimer !== null) {
+        win.clearTimeout(sidebarSyncTimer);
+        sidebarSyncTimer = null;
+      }
+    }
+
+    function pause() {
+      stopObserver();
+      clearTimers();
+    }
+
+    function resume() {
+      if (destroyed) return;
+      applyRootAttributes();
+      if (doc.body) {
+        startObserver();
+        scanVisibleCandidates();
+      }
+    }
+
+    function destroy() {
+      destroyed = true;
+      stopObserver();
+      clearTimers();
     }
 
     return {
@@ -567,6 +595,8 @@
       handleNavigation: handleNavigation,
       scanVisibleCandidates: scanVisibleCandidates,
       flushPending: flushPending,
+      pause: pause,
+      resume: resume,
       destroy: destroy,
       getRoute: currentRoute,
       getSettings: function () { return YTB.normalizeSettings(settings); }
