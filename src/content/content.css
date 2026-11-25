@@ -1,0 +1,312 @@
+/* ==========================================================================
+   YouTube Distraction Blocker - Core Stylesheet (Zero-JS CSS Hiding Layer)
+   Injected at document_start so hidden elements never flash before paint.
+   All rules require html[data-ytb-enabled="true"] and the feature flag attr.
+   ========================================================================== */
+
+/* 1. Infinite Scroll Blocker (Feeds, Search, Watch Next - never Comments/Playlists) */
+html[data-ytb-enabled="true"][data-ytb-infinite-scroll="true"]
+  ytd-browse:not([page-subtype="playlist"]):not([page-subtype="history"])
+  ytd-rich-grid-renderer
+  ytd-continuation-item-renderer:not([data-ytb-allow-continuation="true"]),
+html[data-ytb-enabled="true"][data-ytb-infinite-scroll="true"]
+  ytd-browse:not([page-subtype="playlist"]):not([page-subtype="history"])
+  ytd-section-list-renderer > #contents > ytd-continuation-item-renderer:not([data-ytb-allow-continuation="true"]),
+html[data-ytb-enabled="true"][data-ytb-infinite-scroll="true"]
+  ytd-browse:not([page-subtype="playlist"]):not([page-subtype="history"])
+  ytd-item-section-renderer > #contents > ytd-continuation-item-renderer:not([data-ytb-allow-continuation="true"]),
+html[data-ytb-enabled="true"][data-ytb-infinite-scroll="true"]
+  ytd-search
+  ytd-section-list-renderer > #contents > ytd-item-section-renderer ~ ytd-continuation-item-renderer:not([data-ytb-allow-continuation="true"]),
+html[data-ytb-enabled="true"][data-ytb-infinite-scroll="true"]
+  ytd-search
+  ytd-item-section-renderer > #contents > ytd-continuation-item-renderer:not([data-ytb-allow-continuation="true"]),
+html[data-ytb-enabled="true"][data-ytb-infinite-scroll="true"]
+  ytd-watch-flexy #related ytd-continuation-item-renderer:not([data-ytb-allow-continuation="true"]),
+html[data-ytb-enabled="true"][data-ytb-infinite-scroll="true"]
+  ytd-watch-next-secondary-results-renderer ytd-continuation-item-renderer:not([data-ytb-allow-continuation="true"]),
+html[data-ytb-enabled="true"][data-ytb-infinite-scroll="true"]
+  ytm-browse ytm-continuation-item-renderer:not([data-ytb-allow-continuation="true"]),
+html[data-ytb-enabled="true"][data-ytb-infinite-scroll="true"]
+  ytm-search ytm-continuation-item-renderer:not([data-ytb-allow-continuation="true"]),
+html[data-ytb-enabled="true"][data-ytb-infinite-scroll="true"]
+  ytm-watch-next-secondary-results-renderer ytm-continuation-item-renderer:not([data-ytb-allow-continuation="true"]) {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Manual Search Pagination & Feed-End Indicator */
+.ytb-manual-pagination,
+.ytb-feed-end-note,
+.ytb-blocked-page-banner {
+  display: none;
+}
+
+html[data-ytb-enabled="true"][data-ytb-infinite-scroll="true"] .ytb-manual-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 20px 16px 28px;
+  margin: 8px 0 16px;
+}
+
+.ytb-manual-load-btn {
+  appearance: none;
+  border: 1px solid var(--yt-spec-10-percent-layer, rgba(128, 128, 128, 0.25));
+  background: var(--yt-spec-badge-chip-background, rgba(128, 128, 128, 0.12));
+  color: var(--yt-spec-text-primary, #0f0f0f);
+  font-family: "Roboto", "Arial", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  padding: 10px 20px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, opacity 0.15s ease;
+}
+
+.ytb-manual-load-btn:hover:not(:disabled) {
+  background: var(--yt-spec-10-percent-layer, rgba(128, 128, 128, 0.22));
+}
+
+.ytb-manual-load-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+html[data-ytb-enabled="true"][data-ytb-infinite-scroll="true"] .ytb-feed-end-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 18px 16px 28px;
+  color: var(--yt-spec-text-secondary, #606060);
+  font-family: "Roboto", "Arial", sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.01em;
+}
+
+/* 2. Shorts Navigation Tab Blocker */
+html[data-ytb-enabled="true"][data-ytb-shorts-tab="true"]
+  ytd-guide-entry-renderer:has(a[href="/shorts"]),
+html[data-ytb-enabled="true"][data-ytb-shorts-tab="true"]
+  ytd-guide-entry-renderer:has(a[href^="/shorts?"]),
+html[data-ytb-enabled="true"][data-ytb-shorts-tab="true"]
+  ytd-guide-entry-renderer:has(a[href^="/shorts/"]),
+html[data-ytb-enabled="true"][data-ytb-shorts-tab="true"]
+  ytd-guide-entry-renderer:has(a[title="Shorts" i]),
+html[data-ytb-enabled="true"][data-ytb-shorts-tab="true"]
+  ytd-guide-entry-renderer:has(a[aria-label="Shorts" i]),
+html[data-ytb-enabled="true"][data-ytb-shorts-tab="true"]
+  ytd-mini-guide-entry-renderer:has(a[href="/shorts"]),
+html[data-ytb-enabled="true"][data-ytb-shorts-tab="true"]
+  ytd-mini-guide-entry-renderer:has(a[href^="/shorts?"]),
+html[data-ytb-enabled="true"][data-ytb-shorts-tab="true"]
+  ytd-mini-guide-entry-renderer:has(a[title="Shorts" i]),
+html[data-ytb-enabled="true"][data-ytb-shorts-tab="true"]
+  ytd-mini-guide-entry-renderer:has(a[aria-label="Shorts" i]),
+html[data-ytb-enabled="true"][data-ytb-shorts-tab="true"]
+  yt-tab-shape[tab-title="Shorts" i],
+html[data-ytb-enabled="true"][data-ytb-shorts-tab="true"]
+  ytm-pivot-bar-item-renderer:has(.pivot-shorts),
+html[data-ytb-enabled="true"][data-ytb-shorts-tab="true"]
+  [data-ytb-shorts-tab-item="true"] {
+  display: none !important;
+}
+
+/* 3A. Homepage Shorts Blocker */
+html[data-ytb-enabled="true"][data-ytb-homepage-shorts="true"]
+  ytd-browse[page-subtype="home"] ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[is-shorts]),
+html[data-ytb-enabled="true"][data-ytb-homepage-shorts="true"]
+  ytd-browse[page-subtype="home"] ytd-rich-section-renderer:has(ytd-reel-shelf-renderer),
+html[data-ytb-enabled="true"][data-ytb-homepage-shorts="true"]
+  ytd-browse[page-subtype="home"] ytd-rich-section-renderer:has(ytm-shorts-lockup-view-model),
+html[data-ytb-enabled="true"][data-ytb-homepage-shorts="true"]
+  ytd-browse[page-subtype="home"] ytd-rich-section-renderer:has(ytm-shorts-lockup-view-model-v2),
+html[data-ytb-enabled="true"][data-ytb-homepage-shorts="true"]
+  ytd-browse[page-subtype="home"] ytd-rich-section-renderer:has(grid-shelf-view-model a[href^="/shorts/"]),
+html[data-ytb-enabled="true"][data-ytb-homepage-shorts="true"]
+  ytd-browse[page-subtype="home"] ytd-rich-shelf-renderer[is-shorts],
+html[data-ytb-enabled="true"][data-ytb-homepage-shorts="true"]
+  ytd-browse[page-subtype="home"] ytd-reel-shelf-renderer,
+html[data-ytb-enabled="true"][data-ytb-homepage-shorts="true"]
+  ytd-browse[page-subtype="home"] grid-shelf-view-model:has(ytm-shorts-lockup-view-model),
+html[data-ytb-enabled="true"][data-ytb-homepage-shorts="true"]
+  ytd-browse[page-subtype="home"] grid-shelf-view-model:has(ytm-shorts-lockup-view-model-v2),
+html[data-ytb-enabled="true"][data-ytb-homepage-shorts="true"]
+  ytd-browse[page-subtype="home"] ytd-rich-item-renderer:has(a[href^="/shorts/"]),
+html[data-ytb-enabled="true"][data-ytb-homepage-shorts="true"]
+  ytd-browse[page-subtype="home"] ytd-rich-item-renderer:has(ytm-shorts-lockup-view-model),
+html[data-ytb-enabled="true"][data-ytb-homepage-shorts="true"]
+  ytd-browse[page-subtype="home"] ytd-rich-item-renderer:has(ytm-shorts-lockup-view-model-v2),
+html[data-ytb-enabled="true"][data-ytb-homepage-shorts="true"]
+  ytd-browse[page-subtype="home"] ytd-rich-item-renderer:has(ytd-reel-item-renderer),
+html[data-ytb-enabled="true"][data-ytb-homepage-shorts="true"][data-ytb-route="home"]
+  ytm-reel-shelf-renderer,
+html[data-ytb-enabled="true"][data-ytb-homepage-shorts="true"][data-ytb-route="home"]
+  ytm-rich-section-renderer:has(ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2, a[href^="/shorts/"]),
+html[data-ytb-enabled="true"][data-ytb-homepage-shorts="true"][data-ytb-route="home"]
+  ytm-rich-item-renderer:has(a[href^="/shorts/"]),
+html[data-ytb-enabled="true"][data-ytb-homepage-shorts="true"]
+  [data-ytb-home-shorts-item="true"] {
+  display: none !important;
+}
+
+/* 3B. Optional Search, Subscriptions & Watch Next Shorts Blocker */
+html[data-ytb-enabled="true"][data-ytb-feed-shorts="true"]
+  ytd-search ytd-reel-shelf-renderer,
+html[data-ytb-enabled="true"][data-ytb-feed-shorts="true"]
+  ytd-search grid-shelf-view-model:has(ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2, a[href^="/shorts/"]),
+html[data-ytb-enabled="true"][data-ytb-feed-shorts="true"]
+  ytd-search ytd-video-renderer:has(a[href^="/shorts/"]),
+html[data-ytb-enabled="true"][data-ytb-feed-shorts="true"]
+  ytd-search yt-lockup-view-model:has(a[href^="/shorts/"]),
+html[data-ytb-enabled="true"][data-ytb-feed-shorts="true"]
+  ytd-browse:not([page-subtype="home"]) ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[is-shorts], ytd-reel-shelf-renderer, ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2),
+html[data-ytb-enabled="true"][data-ytb-feed-shorts="true"]
+  ytd-browse:not([page-subtype="home"]) ytd-rich-item-renderer:has(a[href^="/shorts/"], ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2),
+html[data-ytb-enabled="true"][data-ytb-feed-shorts="true"]
+  ytd-browse:not([page-subtype="home"]) ytd-grid-video-renderer:has(a[href^="/shorts/"]),
+html[data-ytb-enabled="true"][data-ytb-feed-shorts="true"]
+  ytd-watch-flexy #related ytd-reel-shelf-renderer,
+html[data-ytb-enabled="true"][data-ytb-feed-shorts="true"]
+  ytd-watch-flexy #related ytd-compact-video-renderer:has(a[href^="/shorts/"]),
+html[data-ytb-enabled="true"][data-ytb-feed-shorts="true"]
+  ytd-watch-flexy #related yt-lockup-view-model:has(a[href^="/shorts/"]),
+html[data-ytb-enabled="true"][data-ytb-feed-shorts="true"]
+  [data-ytb-feed-shorts-item="true"] {
+  display: none !important;
+}
+
+/* 4. Trending Blocker */
+html[data-ytb-enabled="true"][data-ytb-trending="true"]
+  ytd-guide-entry-renderer:has(a[href="/feed/trending"]),
+html[data-ytb-enabled="true"][data-ytb-trending="true"]
+  ytd-guide-entry-renderer:has(a[href^="/feed/trending?"]),
+html[data-ytb-enabled="true"][data-ytb-trending="true"]
+  ytd-guide-entry-renderer:has(a[href="/feed/explore"]),
+html[data-ytb-enabled="true"][data-ytb-trending="true"]
+  ytd-guide-entry-renderer:has(a[href^="/feed/explore?"]),
+html[data-ytb-enabled="true"][data-ytb-trending="true"]
+  ytd-guide-entry-renderer:has(a[title="Trending" i]),
+html[data-ytb-enabled="true"][data-ytb-trending="true"]
+  ytd-mini-guide-entry-renderer:has(a[href^="/feed/trending"]),
+html[data-ytb-enabled="true"][data-ytb-trending="true"]
+  ytd-mini-guide-entry-renderer:has(a[href="/feed/explore"]),
+html[data-ytb-enabled="true"][data-ytb-trending="true"]
+  ytd-browse[page-subtype="trending"] #primary,
+html[data-ytb-enabled="true"][data-ytb-trending="true"]
+  ytd-browse[page-subtype="trending"] #header,
+html[data-ytb-enabled="true"][data-ytb-trending="true"]
+  ytd-rich-section-renderer:has(#title-container a[href^="/feed/trending"]),
+html[data-ytb-enabled="true"][data-ytb-trending="true"]
+  ytd-shelf-renderer:has(#title-container a[href^="/feed/trending"]),
+html[data-ytb-enabled="true"][data-ytb-trending="true"]
+  ytd-item-section-renderer:has(ytd-shelf-renderer #title-container a[href^="/feed/trending"]),
+html[data-ytb-enabled="true"][data-ytb-trending="true"]
+  [data-ytb-trending-item="true"] {
+  display: none !important;
+}
+
+html[data-ytb-enabled="true"][data-ytb-trending="true"][data-ytb-route="trending"]
+  .ytb-blocked-page-banner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  max-width: 480px;
+  margin: 64px auto;
+  padding: 28px 24px;
+  border-radius: 14px;
+  background: var(--yt-spec-badge-chip-background, rgba(128, 128, 128, 0.1));
+  border: 1px solid var(--yt-spec-10-percent-layer, rgba(128, 128, 128, 0.2));
+  color: var(--yt-spec-text-primary, #0f0f0f);
+  font-family: "Roboto", "Arial", sans-serif;
+  text-align: center;
+}
+
+.ytb-blocked-page-banner strong {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.ytb-blocked-page-banner span {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--yt-spec-text-secondary, #606060);
+}
+
+/* 5. YouTube Premium Promotional Content Blocker */
+html[data-ytb-enabled="true"][data-ytb-premium="true"]
+  ytd-guide-entry-renderer:has(a[href="/premium"]),
+html[data-ytb-enabled="true"][data-ytb-premium="true"]
+  ytd-guide-entry-renderer:has(a[href^="/premium?"]),
+html[data-ytb-enabled="true"][data-ytb-premium="true"]
+  ytd-guide-entry-renderer:has(a[href*="youtube.com/premium"]),
+html[data-ytb-enabled="true"][data-ytb-premium="true"]
+  ytd-guide-entry-renderer:has(a[title="YouTube Premium" i]),
+html[data-ytb-enabled="true"][data-ytb-premium="true"]
+  ytd-banner-promo-renderer:has(a[href*="/premium"]),
+html[data-ytb-enabled="true"][data-ytb-premium="true"]
+  ytd-rich-section-renderer:has(ytd-banner-promo-renderer a[href*="/premium"]),
+html[data-ytb-enabled="true"][data-ytb-premium="true"]
+  ytd-statement-banner-renderer:has(a[href*="/premium"]),
+html[data-ytb-enabled="true"][data-ytb-premium="true"]
+  ytd-rich-section-renderer:has(ytd-statement-banner-renderer a[href*="/premium"]),
+html[data-ytb-enabled="true"][data-ytb-premium="true"]
+  ytd-mealbar-promo-renderer:has(a[href*="/premium"]),
+html[data-ytb-enabled="true"][data-ytb-premium="true"]
+  ytd-upsell-dialog-renderer,
+html[data-ytb-enabled="true"][data-ytb-premium="true"]
+  tp-yt-paper-dialog:has(ytd-upsell-dialog-renderer),
+html[data-ytb-enabled="true"][data-ytb-premium="true"]
+  [data-ytb-premium-item="true"] {
+  display: none !important;
+}
+
+/* 6. Members-Only & Join-Exclusive Content Blocker */
+html[data-ytb-enabled="true"][data-ytb-members="true"]
+  ytd-rich-item-renderer:has(ytd-sponsors-only-badge-renderer, .badge-style-type-members-only),
+html[data-ytb-enabled="true"][data-ytb-members="true"]
+  ytd-video-renderer:has(ytd-sponsors-only-badge-renderer, .badge-style-type-members-only),
+html[data-ytb-enabled="true"][data-ytb-members="true"]
+  ytd-grid-video-renderer:has(ytd-sponsors-only-badge-renderer, .badge-style-type-members-only),
+html[data-ytb-enabled="true"][data-ytb-members="true"]
+  ytd-compact-video-renderer:has(ytd-sponsors-only-badge-renderer, .badge-style-type-members-only),
+html[data-ytb-enabled="true"][data-ytb-members="true"]
+  ytd-playlist-video-renderer:has(ytd-sponsors-only-badge-renderer, .badge-style-type-members-only),
+html[data-ytb-enabled="true"][data-ytb-members="true"]
+  yt-lockup-view-model:has(ytd-sponsors-only-badge-renderer, .badge-style-type-members-only),
+html[data-ytb-enabled="true"][data-ytb-members="true"]
+  ytd-reel-item-renderer:has(ytd-sponsors-only-badge-renderer, .badge-style-type-members-only),
+html[data-ytb-enabled="true"][data-ytb-members="true"]
+  ytd-backstage-post-thread-renderer:has(ytd-sponsors-only-badge-renderer, #sponsors-only-badge, .badge-style-type-members-only),
+html[data-ytb-enabled="true"][data-ytb-members="true"]
+  ytd-post-renderer:has(ytd-sponsors-only-badge-renderer, #sponsors-only-badge, .badge-style-type-members-only),
+html[data-ytb-enabled="true"][data-ytb-members="true"]
+  ytd-backstage-post-renderer:has(ytd-sponsors-only-badge-renderer, #sponsors-only-badge, .badge-style-type-members-only),
+html[data-ytb-enabled="true"][data-ytb-members="true"]
+  ytd-recognition-shelf-renderer,
+html[data-ytb-enabled="true"][data-ytb-members="true"]
+  ytd-rich-section-renderer:has(ytd-recognition-shelf-renderer, ytd-sponsorships-tier-renderer, ytd-membership-offer-renderer),
+html[data-ytb-enabled="true"][data-ytb-members="true"]
+  ytd-shelf-renderer:has(ytd-recognition-shelf-renderer, ytd-sponsorships-tier-renderer, ytd-membership-offer-renderer),
+html[data-ytb-enabled="true"][data-ytb-members="true"]
+  ytm-video-with-context-renderer:has(.badge-style-type-members-only),
+html[data-ytb-enabled="true"][data-ytb-members="true"]
+  [data-ytb-members-item="true"] {
+  display: none !important;
+}
+
+/* 7. Empty Sidebar Section Cleanup (only when all entries inside section are hidden) */
+html[data-ytb-enabled="true"]
+  ytd-guide-section-renderer[data-ytb-empty-section="true"] {
+  display: none !important;
+}

@@ -1,0 +1,23 @@
+.options-page {
+  min-height: 100vh;
+  padding: 24px 16px;
+}
+
+.options-card-shell {
+  max-width: 760px;
+  margin: 0 auto;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.feature-groups-mount {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.options-sidebar-list {
+  max-height: 440px;
+}

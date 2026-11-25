@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Distraction Blocker — Settings</title>
+  <link rel="stylesheet" href="../shared/ui.css">
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="options-page">
+    <div class="app-shell options-card-shell">
+      <header class="app-header">
+        <div class="brand">
+          <img class="brand-icon" src="../../assets/icons/icon48.png" alt="">
+          <div class="brand-text">
+            <h1 class="brand-title">YouTube Distraction Blocker — Settings</h1>
+            <span id="status-pill" class="status-pill">Active</span>
+          </div>
+        </div>
+        <div class="header-controls">
+          <div class="master-wrap">
+            <span class="master-label">Master Protection</span>
+            <span id="master-switch-mount"></span>
+          </div>
+        </div>
+      </header>
+
+      <div id="paused-banner" class="paused-banner" hidden>
+        Protection paused — your individual toggles are preserved and will resume when Master is switched ON.
+      </div>
+
+      <main id="content-area" class="content-area">
+        <div id="feature-groups-mount" class="feature-groups-mount"></div>
+
+        <section class="section-card">
+          <div class="section-header">
+            <h2 class="section-title">Sidebar Customization</h2>
+            <span id="sidebar-summary" class="section-meta">0 hidden</span>
+          </div>
+          <div class="sidebar-toolbar">
+            <input id="sidebar-filter" class="search-input" type="search" placeholder="Search sidebar categories & navigation items...">
+            <button id="refresh-sidebar-btn" class="btn" type="button">Refresh from YouTube</button>
+          </div>
+          <div id="sidebar-list" class="rows-list sidebar-list options-sidebar-list"></div>
+        </section>
+      </main>
+
+      <footer class="app-footer">
+        <span id="footer-status" class="footer-status">Local settings · Stored privately in chrome.storage.local</span>
+        <button id="restore-defaults-btn" class="btn btn-danger-ghost" type="button">Restore Defaults</button>
+      </footer>
+    </div>
+  </div>
+
+  <script src="../shared/defaults.js"></script>
+  <script src="../shared/storage.js"></script>
+  <script src="../shared/dashboard-ui.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>

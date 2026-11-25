@@ -1,0 +1,57 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube Distraction Blocker",
+  "short_name": "YT Focus",
+  "version": "1.0.0",
+  "description": "Lightweight, local-only distraction blocker for YouTube: stop infinite scroll, Shorts, Trending, Premium upsells, Members-only items, and sidebar clutter.",
+  "permissions": [
+    "storage"
+  ],
+  "icons": {
+    "16": "assets/icons/icon16.png",
+    "32": "assets/icons/icon32.png",
+    "48": "assets/icons/icon48.png",
+    "128": "assets/icons/icon128.png"
+  },
+  "action": {
+    "default_popup": "src/popup/popup.html",
+    "default_title": "YouTube Distraction Blocker",
+    "default_icon": {
+      "16": "assets/icons/icon16.png",
+      "32": "assets/icons/icon32.png",
+      "48": "assets/icons/icon48.png",
+      "128": "assets/icons/icon128.png"
+    }
+  },
+  "options_ui": {
+    "page": "src/options/options.html",
+    "open_in_tab": true
+  },
+  "background": {
+    "service_worker": "src/background/service-worker.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.youtube.com/*",
+        "https://m.youtube.com/*"
+      ],
+      "exclude_matches": [
+        "https://www.youtube.com/embed/*",
+        "https://www.youtube.com/live_chat*",
+        "https://www.youtube.com/live_chat_replay*"
+      ],
+      "css": [
+        "src/content/content.css"
+      ],
+      "js": [
+        "src/shared/defaults.js",
+        "src/shared/storage.js",
+        "src/content/selectors.js",
+        "src/content/dom-observer.js",
+        "src/content/main.js"
+      ],
+      "run_at": "document_start"
+    }
+  ]
+}

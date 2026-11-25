@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Distraction Blocker</title>
+  <link rel="stylesheet" href="../shared/ui.css">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="brand">
+        <img class="brand-icon" src="../../assets/icons/icon32.png" alt="">
+        <div class="brand-text">
+          <h1 class="brand-title">YouTube Blocker</h1>
+          <span id="status-pill" class="status-pill">Active</span>
+        </div>
+      </div>
+      <div class="header-controls">
+        <div class="master-wrap">
+          <span class="master-label">Master</span>
+          <span id="master-switch-mount"></span>
+        </div>
+        <button id="open-options-btn" class="icon-btn" type="button" title="Open full settings page" aria-label="Open full settings page">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.85 1 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <div id="paused-banner" class="paused-banner" hidden>
+      Protection paused — your individual toggles are preserved and will resume when Master is switched ON.
+    </div>
+
+    <main id="content-area" class="content-area">
+      <div id="feature-groups-mount" class="feature-groups-mount"></div>
+
+      <section class="section-card">
+        <div class="section-header">
+          <h2 class="section-title">Sidebar</h2>
+          <span id="sidebar-summary" class="section-meta">0 hidden</span>
+        </div>
+        <div class="sidebar-toolbar">
+          <input id="sidebar-filter" class="search-input" type="search" placeholder="Filter sidebar items (e.g. Kids, Music, Gaming)">
+          <button id="refresh-sidebar-btn" class="btn" type="button" title="Re-scan active YouTube tab sidebar">Scan</button>
+        </div>
+        <div id="sidebar-list" class="rows-list sidebar-list"></div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <span id="footer-status" class="footer-status">Local settings · No data collected</span>
+      <button id="restore-defaults-btn" class="btn btn-danger-ghost" type="button">Restore Defaults</button>
+    </footer>
+  </div>
+
+  <script src="../shared/defaults.js"></script>
+  <script src="../shared/storage.js"></script>
+  <script src="../shared/dashboard-ui.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

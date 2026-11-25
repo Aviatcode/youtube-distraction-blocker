@@ -1,0 +1,15 @@
+# OS & Finder / Explorer metadata
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Logs & temporary files
+*.log
+*.tmp
+
+# Editor & IDE directories
+.vscode/
+.idea/
+
+# Optional local dependencies (not used at runtime)
+node_modules/

@@ -1,0 +1,19 @@
+body {
+  width: 376px;
+  min-height: 440px;
+  max-height: 580px;
+  overflow-y: auto;
+}
+
+.feature-groups-mount {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.toggle-desc {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
