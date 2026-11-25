@@ -388,6 +388,8 @@
       lowerHref === '/playables' ||
       lowerHref.indexOf('/playables?') === 0 ||
       lowerHref.indexOf('/playables/') === 0 ||
+      lowerHref.indexOf('/feed/playables') === 0 ||
+      lowerHref.indexOf('/gaming/playables') === 0 ||
       lowerHref.indexOf('youtube.com/playables') !== -1 ||
       lowerLabel === 'playables' ||
       lowerLabel === 'youtube playables'

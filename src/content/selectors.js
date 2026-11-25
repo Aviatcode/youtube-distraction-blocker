@@ -18,8 +18,10 @@
       'yt-lockup-view-model',
       'ytd-reel-item-renderer',
       'mini-game-card-view-model',
+      'yt-mini-game-card-view-model',
       'ytd-mini-game-card-view-model',
       'ytm-mini-game-card-view-model',
+      'ytd-mini-game-renderer',
       'ytm-video-with-context-renderer',
       'ytm-rich-item-renderer'
     ].join(','),
@@ -35,6 +37,7 @@
       'ytd-rich-shelf-renderer',
       'ytd-reel-shelf-renderer',
       'ytd-shelf-renderer',
+      'ytd-horizontal-card-list-renderer',
       'ytd-recognition-shelf-renderer',
       'grid-shelf-view-model',
       'ytm-reel-shelf-renderer',
@@ -135,6 +138,13 @@
   ]);
 
   var PLAYABLES_LABELS = Object.freeze([
+    'playables',
+    'youtube playables',
+    'watch & play'
+  ]);
+
+  var PLAYABLES_BADGE_EXACT = Object.freeze([
+    'playable',
     'playables',
     'youtube playables'
   ]);
@@ -385,12 +395,23 @@
   function isPlayablesLink(href) {
     if (!href) return false;
     var lower = String(href).trim().toLowerCase();
-    if (lower === '/playables' || lower.indexOf('/playables/') === 0 || lower.indexOf('/playables?') === 0) {
+    if (
+      lower === '/playables' ||
+      lower.indexOf('/playables/') === 0 ||
+      lower.indexOf('/playables?') === 0 ||
+      lower.indexOf('/feed/playables') === 0 ||
+      lower.indexOf('/gaming/playables') === 0
+    ) {
       return true;
     }
     try {
       var parsed = new URL(href, 'https://www.youtube.com');
-      return parsed.pathname === '/playables' || parsed.pathname.indexOf('/playables/') === 0;
+      var host = parsed.hostname.toLowerCase();
+      if (host !== 'www.youtube.com' && host !== 'm.youtube.com' && host !== 'youtube.com') {
+        return false;
+      }
+      var p = parsed.pathname.toLowerCase();
+      return p === '/playables' || p.indexOf('/playables/') === 0 || p.indexOf('/feed/playables') === 0 || p.indexOf('/gaming/playables') === 0;
     } catch (_) {
       return false;
     }
@@ -399,15 +420,36 @@
   function isPlayablesCardOrShelf(el) {
     if (!isElement(el)) return false;
     var tag = (el.tagName || '').toLowerCase();
-    if (tag === 'mini-game-card-view-model' || tag === 'ytd-mini-game-card-view-model' || tag === 'ytm-mini-game-card-view-model') {
+    if (
+      tag === 'mini-game-card-view-model' ||
+      tag === 'yt-mini-game-card-view-model' ||
+      tag === 'ytd-mini-game-card-view-model' ||
+      tag === 'ytm-mini-game-card-view-model' ||
+      tag === 'ytd-mini-game-renderer'
+    ) {
       return true;
     }
-    if (el.querySelector('mini-game-card-view-model, ytd-mini-game-card-view-model, ytm-mini-game-card-view-model')) {
+    if (el.hasAttribute('is-mini-game-card-shelf') || el.hasAttribute('is-playables')) {
       return true;
     }
-    if (tag === 'ytd-rich-section-renderer' || tag === 'ytd-rich-shelf-renderer' || tag === 'ytd-shelf-renderer' || tag === 'grid-shelf-view-model') {
-      var heading = el.querySelector('#title, #title-text, h2');
-      if (matchesExactPhrase(getTextSafe(heading), PLAYABLES_LABELS)) {
+    if (el.querySelector(
+      '[is-mini-game-card-shelf], [is-playables], mini-game-card-view-model, yt-mini-game-card-view-model, ytd-mini-game-card-view-model, ytm-mini-game-card-view-model, ytd-mini-game-renderer'
+    )) {
+      return true;
+    }
+    if (el.matches && el.matches(SELECTORS.SHELF)) {
+      var headings = el.querySelectorAll('#title, #title-text, h2, [role="heading"], .yt-shelf-header-layout__title');
+      for (var h = 0; h < headings.length; h++) {
+        if (matchesExactPhrase(getTextSafe(headings[h]), PLAYABLES_LABELS)) {
+          return true;
+        }
+      }
+    }
+    var badges = el.querySelectorAll(SELECTORS.BADGE_NODES);
+    for (var b = 0; b < badges.length; b++) {
+      var bText = getTextSafe(badges[b]);
+      var bAria = normalizeText(getAttributeSafe(badges[b], 'aria-label'));
+      if (matchesExactPhrase(bText, PLAYABLES_BADGE_EXACT) || matchesExactPhrase(bAria, PLAYABLES_BADGE_EXACT)) {
         return true;
       }
     }

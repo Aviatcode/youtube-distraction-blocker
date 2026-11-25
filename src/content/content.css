@@ -315,25 +315,45 @@ html[data-ytb-enabled="true"][data-ytb-members="true"]
 
 /* 7. YouTube Playables Blocker */
 html[data-ytb-enabled="true"][data-ytb-playables="true"]
-  ytd-guide-entry-renderer:has(a[href="/playables"], a[href^="/playables?"], a[href^="/playables/"], a[title="Playables" i], a[aria-label="Playables" i]),
+  ytd-guide-entry-renderer:has(a[href="/playables"], a[href^="/playables?"], a[href^="/playables/"], a[href*="/feed/playables"], a[href*="/gaming/playables"], a[title="Playables" i], a[aria-label="Playables" i]),
 html[data-ytb-enabled="true"][data-ytb-playables="true"]
-  ytd-mini-guide-entry-renderer:has(a[href="/playables"], a[href^="/playables?"], a[href^="/playables/"], a[title="Playables" i], a[aria-label="Playables" i]),
+  ytd-mini-guide-entry-renderer:has(a[href="/playables"], a[href^="/playables?"], a[href^="/playables/"], a[href*="/feed/playables"], a[href*="/gaming/playables"], a[title="Playables" i], a[aria-label="Playables" i]),
 html[data-ytb-enabled="true"][data-ytb-playables="true"]
-  ytd-rich-section-renderer:has(mini-game-card-view-model, ytd-mini-game-card-view-model, ytm-mini-game-card-view-model, a[href="/playables"], a[href^="/playables/"], a[href^="/playables?"]),
+  [is-mini-game-card-shelf],
 html[data-ytb-enabled="true"][data-ytb-playables="true"]
-  ytd-rich-shelf-renderer:has(mini-game-card-view-model, ytd-mini-game-card-view-model, ytm-mini-game-card-view-model),
+  [is-playables],
 html[data-ytb-enabled="true"][data-ytb-playables="true"]
-  grid-shelf-view-model:has(mini-game-card-view-model, ytd-mini-game-card-view-model, ytm-mini-game-card-view-model),
+  ytd-rich-section-renderer:has([is-mini-game-card-shelf], [is-playables], mini-game-card-view-model, yt-mini-game-card-view-model, ytd-mini-game-card-view-model, ytm-mini-game-card-view-model, ytd-mini-game-renderer, a[href="/playables"], a[href^="/playables/"], a[href^="/playables?"], a[href^="https://www.youtube.com/playables"]),
 html[data-ytb-enabled="true"][data-ytb-playables="true"]
-  ytd-shelf-renderer:has(mini-game-card-view-model, ytd-mini-game-card-view-model, ytm-mini-game-card-view-model),
+  ytd-rich-shelf-renderer:has([is-mini-game-card-shelf], [is-playables], mini-game-card-view-model, yt-mini-game-card-view-model, ytd-mini-game-card-view-model, ytm-mini-game-card-view-model, ytd-mini-game-renderer, a[href="/playables"], a[href^="/playables/"]),
 html[data-ytb-enabled="true"][data-ytb-playables="true"]
-  ytd-rich-item-renderer:has(mini-game-card-view-model, ytd-mini-game-card-view-model, ytm-mini-game-card-view-model, a[href="/playables"], a[href^="/playables/"], a[href^="/playables?"]),
+  grid-shelf-view-model:has([is-mini-game-card-shelf], [is-playables], mini-game-card-view-model, yt-mini-game-card-view-model, ytd-mini-game-card-view-model, ytm-mini-game-card-view-model, ytd-mini-game-renderer, a[href="/playables"], a[href^="/playables/"]),
+html[data-ytb-enabled="true"][data-ytb-playables="true"]
+  ytd-shelf-renderer:has([is-mini-game-card-shelf], [is-playables], mini-game-card-view-model, yt-mini-game-card-view-model, ytd-mini-game-card-view-model, ytm-mini-game-card-view-model, ytd-mini-game-renderer, a[href="/playables"], a[href^="/playables/"]),
+html[data-ytb-enabled="true"][data-ytb-playables="true"]
+  ytd-reel-shelf-renderer:has(mini-game-card-view-model, yt-mini-game-card-view-model, ytd-mini-game-card-view-model, ytm-mini-game-card-view-model, ytd-mini-game-renderer, a[href="/playables"], a[href^="/playables/"]),
+html[data-ytb-enabled="true"][data-ytb-playables="true"]
+  ytd-horizontal-card-list-renderer:has(mini-game-card-view-model, yt-mini-game-card-view-model, ytd-mini-game-card-view-model, ytm-mini-game-card-view-model, ytd-mini-game-renderer, a[href="/playables"], a[href^="/playables/"]),
+html[data-ytb-enabled="true"][data-ytb-playables="true"]
+  ytd-rich-item-renderer:has(mini-game-card-view-model, yt-mini-game-card-view-model, ytd-mini-game-card-view-model, ytm-mini-game-card-view-model, ytd-mini-game-renderer, a[href="/playables"], a[href^="/playables/"], a[href^="/playables?"]),
+html[data-ytb-enabled="true"][data-ytb-playables="true"]
+  ytd-video-renderer:has(mini-game-card-view-model, yt-mini-game-card-view-model, ytd-mini-game-card-view-model, ytd-mini-game-renderer, a[href="/playables"], a[href^="/playables/"]),
+html[data-ytb-enabled="true"][data-ytb-playables="true"]
+  ytd-compact-video-renderer:has(mini-game-card-view-model, yt-mini-game-card-view-model, ytd-mini-game-card-view-model, ytd-mini-game-renderer, a[href="/playables"], a[href^="/playables/"]),
+html[data-ytb-enabled="true"][data-ytb-playables="true"]
+  yt-lockup-view-model:has(mini-game-card-view-model, yt-mini-game-card-view-model, ytd-mini-game-card-view-model, ytd-mini-game-renderer, a[href="/playables"], a[href^="/playables/"]),
+html[data-ytb-enabled="true"][data-ytb-playables="true"]
+  ytm-rich-section-renderer:has(mini-game-card-view-model, yt-mini-game-card-view-model, ytm-mini-game-card-view-model, a[href="/playables"], a[href^="/playables/"]),
 html[data-ytb-enabled="true"][data-ytb-playables="true"]
   mini-game-card-view-model,
+html[data-ytb-enabled="true"][data-ytb-playables="true"]
+  yt-mini-game-card-view-model,
 html[data-ytb-enabled="true"][data-ytb-playables="true"]
   ytd-mini-game-card-view-model,
 html[data-ytb-enabled="true"][data-ytb-playables="true"]
   ytm-mini-game-card-view-model,
+html[data-ytb-enabled="true"][data-ytb-playables="true"]
+  ytd-mini-game-renderer,
 html[data-ytb-enabled="true"][data-ytb-playables="true"]
   ytd-browse[page-subtype="playables"] #primary,
 html[data-ytb-enabled="true"][data-ytb-playables="true"]

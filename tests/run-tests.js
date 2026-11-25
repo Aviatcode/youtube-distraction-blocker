@@ -621,13 +621,33 @@ async function runAll() {
     ]);
 
     var homePlayablesChip = el(doc, 'yt-chip-cloud-chip-renderer', { id: 'home-playables-chip' }, [], 'Playables');
+    var attrPlayablesShelf = el(doc, 'ytd-rich-section-renderer', { id: 'attr-playables-shelf' }, [
+      el(doc, 'ytd-rich-shelf-renderer', { 'is-mini-game-card-shelf': '' }, [
+        el(doc, 'yt-mini-game-card-view-model', {}, [], 'Arcade Game')
+      ])
+    ]);
+    var watchSidebarPlayables = el(doc, 'ytd-horizontal-card-list-renderer', { id: 'watch-playables-shelf' }, [
+      el(doc, 'span', { role: 'heading' }, [], 'Watch & Play'),
+      el(doc, 'mini-game-card-view-model', {}, [], 'Mini Game')
+    ]);
+    var lockupPlayableBadge = el(doc, 'yt-lockup-view-model', { id: 'lockup-playable' }, [
+      el(doc, 'badge-shape', {}, [], 'Playable')
+    ]);
     var normalGamingVideo = el(doc, 'ytd-rich-item-renderer', { id: 'normal-gaming' }, [
       el(doc, 'a', { href: '/watch?v=game99', id: 'video-title' }, [], 'Trying YouTube Playables Review')
     ]);
-    var homeBrowse = el(doc, 'ytd-browse', { 'page-subtype': 'home' }, [homePlayablesChip, playablesShelf, normalGamingVideo]);
+    var homeBrowse = el(doc, 'ytd-browse', { 'page-subtype': 'home' }, [
+      homePlayablesChip,
+      playablesShelf,
+      attrPlayablesShelf,
+      lockupPlayableBadge,
+      normalGamingVideo
+    ]);
+    var watchSecondary = el(doc, 'div', { id: 'secondary' }, [watchSidebarPlayables]);
 
     doc.body.appendChild(exploreSec);
     doc.body.appendChild(homeBrowse);
+    doc.body.appendChild(watchSecondary);
 
     var ctrl = controllerMod.createController({ document: doc, window: win });
     var settings = YTB.createDefaultSettings();
@@ -637,7 +657,11 @@ async function runAll() {
     assert.strictEqual(playablesSidebar.getAttribute('data-ytb-playables-item'), 'true');
     assert.strictEqual(exploreSec.getAttribute('data-ytb-empty-section'), 'true');
     assert.strictEqual(playablesShelf.getAttribute('data-ytb-playables-item'), 'true');
+    assert.strictEqual(attrPlayablesShelf.getAttribute('data-ytb-playables-item'), 'true');
+    assert.strictEqual(watchSidebarPlayables.getAttribute('data-ytb-playables-item'), 'true');
+    assert.strictEqual(lockupPlayableBadge.getAttribute('data-ytb-playables-item'), 'true');
     assert.strictEqual(homePlayablesChip.getAttribute('data-ytb-playables-item'), 'true');
+    assert.strictEqual(YTB.resolveSidebarEntry({ href: '/gaming/playables', label: 'Games' }).key, 'playables');
     // Normal video mentioning "YouTube Playables" in title must NOT be hidden.
     assert.strictEqual(normalGamingVideo.hasAttribute('data-ytb-playables-item'), false);
 
